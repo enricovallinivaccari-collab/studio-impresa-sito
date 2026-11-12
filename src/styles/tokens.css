@@ -1,0 +1,41 @@
+/* Token dal file Figma "Studio Impresa Website" (collezioni Primitives e Tokens). */
+:root {
+  /* Colori */
+  --color-night: #040f15;          /* Colors/Night · Background/Page Dark */
+  --color-brand-600: #006eb7;      /* Button/Primary Background */
+  --color-brand-800: #034677;      /* Background/Menu Hover */
+  --color-brand-400: #4f8fcc;
+  --color-brand-300: #8ab5e1;
+  --color-cream: #f9f5ef;          /* Text/Menu Hover */
+  --color-on-dark: #ffffff;        /* Text/On Dark */
+  --color-border: #d7dde1;         /* Border/Border */
+  --color-placeholder: #d9d9d9;
+
+  /* Famiglie */
+  --font-heading: 'DM Sans Variable', 'DM Sans', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Atkinson Hyperlegible Mono', ui-monospace, monospace;
+
+  /* Taglie (Typeface/size e line height) */
+  --display-3xl-size: 80px;  --display-3xl-lh: 82px;
+  --text-lg-size: 18px;      --text-lg-lh: 28px;
+  --text-sm-size: 14px;      --text-sm-lh: 20px;
+  --text-xs-size: 12px;      --text-xs-lh: 18px;
+
+  /* Spaziature (Utilities/Spacing) */
+  --space-2: 8px;
+  --space-2-5: 10px;
+  --space-3: 12px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* Raggi */
+  --radius-lg: 8px;
+  --radius-full: 999px;
+
+  /* Animazioni */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}

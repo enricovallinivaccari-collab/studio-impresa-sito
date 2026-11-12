@@ -1,0 +1,84 @@
+---
+// Componente Figma "Header" (Desktop, tema Scuro) con le voci "Voce menu".
+import Pulsante from './Pulsante.astro';
+
+const base = import.meta.env.BASE_URL;
+const voci = [
+  { testo: 'Servizi', href: '#servizi' },
+  { testo: 'Chi siamo', href: '#chi-siamo' },
+  { testo: 'Approfondimenti', href: '#approfondimenti' },
+  { testo: 'Eventi', href: '#eventi' },
+  { testo: 'Contatti', href: '#contatti' },
+];
+---
+
+<header class="header">
+  <a href={`${base}/`} class="header__logo" aria-label="Studio Impresa, torna alla home">
+    <img src={`${base}/logo-negativo.svg`} width="135" height="43" alt="Studio Impresa" />
+  </a>
+
+  <nav class="header__menu" aria-label="Menu principale">
+    {voci.map((v) => <a class="voce-menu occhiello" href={v.href}>{v.testo}</a>)}
+  </nav>
+
+  <div class="header__azioni">
+    <Pulsante href="#area-clienti" dimensione="piccola" freccia={false}>Area clienti</Pulsante>
+    <button class="header__menu-mobile occhiello" type="button" aria-label="Apri il menu">Menu</button>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+    padding: 15px var(--space-16);
+    background: var(--color-night);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .header__logo img { width: 135px; height: auto; }
+
+  .header__menu { display: flex; gap: var(--space-3); }
+
+  /* Componente "Voce menu": hover = pillola Brand 800 con testo crema */
+  .voce-menu {
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-full);
+    color: var(--color-on-dark);
+    transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out);
+  }
+  .voce-menu:hover,
+  .voce-menu:focus-visible {
+    background: var(--color-brand-800);
+    color: var(--color-cream);
+    outline: none;
+  }
+
+  .header__azioni { display: flex; align-items: center; gap: var(--space-6); }
+
+  .header__menu-mobile {
+    display: none;
+    background: none;
+    border: 1.5px solid var(--color-on-dark);
+    border-radius: var(--radius-full);
+    color: var(--color-on-dark);
+    padding: var(--space-2) var(--space-3);
+    cursor: pointer;
+  }
+
+  @media (max-width: 1024px) {
+    .header { padding-inline: var(--space-6); }
+    .header__menu { display: none; }
+    .header__menu-mobile { display: inline-block; }
+  }
+
+  @media (max-width: 480px) {
+    .header { padding-inline: 16px; }
+    .header__azioni :global(.pulsante) { display: none; }
+  }
+</style>

@@ -1,0 +1,35 @@
+@import '@fontsource-variable/dm-sans/opsz.css';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/atkinson-hyperlegible-mono/400.css';
+@import './tokens.css';
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  background: var(--color-night);
+  color: var(--color-on-dark);
+  font-family: var(--font-body);
+  font-size: var(--text-lg-size);
+  line-height: var(--text-lg-lh);
+  -webkit-font-smoothing: antialiased;
+}
+
+img { display: block; max-width: 100%; }
+
+a { color: inherit; text-decoration: none; }
+
+/* Stile "Mono sm/Occhiello" */
+.occhiello {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm-size);
+  line-height: var(--text-sm-lh);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}

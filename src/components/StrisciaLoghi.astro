@@ -1,0 +1,66 @@
+---
+// Sezione Figma "Clienti" (70:61): striscia di loghi che scorre all'infinito.
+const base = import.meta.env.BASE_URL;
+const loghi = [
+  { file: 'smurfit-westrock.svg', nome: 'Smurfit Westrock', w: 144, h: 34 },
+  { file: 'claro.svg', nome: 'Claro', w: 77, h: 28 },
+  { file: 'pittini.svg', nome: 'Pittini', w: 80, h: 42 },
+  { file: 'wurth.svg', nome: 'Würth', w: 103, h: 22 },
+];
+// Il gruppo si ripete: due copie bastano per un ciclo continuo, le altre riempiono gli schermi larghi.
+const copie = 4;
+---
+
+<section class="clienti" aria-labelledby="clienti-titolo">
+  <p id="clienti-titolo" class="occhiello clienti__titolo">Realtà che crescono con noi</p>
+
+  <div class="striscia" data-striscia>
+    <div class="striscia__binario" data-binario>
+      {Array.from({ length: copie }).map((_, i) => (
+        <ul class="striscia__gruppo" aria-hidden={i > 0 ? 'true' : undefined}>
+          {loghi.map((l) => (
+            <li>
+              <img src={`${base}/loghi/${l.file}`} width={l.w} height={l.h} alt={i === 0 ? l.nome : ''} loading="lazy" />
+            </li>
+          ))}
+        </ul>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .clienti {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+    padding: var(--space-8) 0 var(--space-24);
+    overflow: hidden;
+  }
+  .clienti__titolo { padding-inline: var(--space-16); }
+
+  .striscia {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .striscia__binario { display: flex; width: max-content; will-change: transform; }
+
+  .striscia__gruppo {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 0 15px;
+    margin: 0;
+    list-style: none;
+  }
+  .striscia__gruppo img { height: auto; max-width: none; }
+
+  @media (max-width: 1024px) {
+    .clienti__titolo { padding-inline: var(--space-6); }
+  }
+  @media (max-width: 768px) {
+    .clienti__titolo { padding-inline: 16px; }
+  }
+</style>

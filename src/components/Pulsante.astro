@@ -1,0 +1,46 @@
+---
+// Componente Figma "Pulsante": stile Primario | Contorno chiaro, dimensione Grande | Piccola.
+interface Props {
+  href?: string;
+  stile?: 'primario' | 'contorno-chiaro';
+  dimensione?: 'grande' | 'piccola';
+  freccia?: boolean;
+}
+
+const { href = '#', stile = 'primario', dimensione = 'grande', freccia = true } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<a href={href} class:list={['pulsante', `pulsante--${stile}`, `pulsante--${dimensione}`]}>
+  <span><slot /></span>
+  {freccia && <img class="pulsante__freccia" src={`${base}/icone/freccia.svg`} width="16" height="16" alt="" />}
+</a>
+
+<style>
+  .pulsante {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) 18px;
+    border-radius: var(--radius-full);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs-size);
+    line-height: var(--text-xs-lh);
+    color: var(--color-on-dark);
+    white-space: nowrap;
+    transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out);
+  }
+  .pulsante--piccola { padding-block: var(--space-2); }
+
+  .pulsante--primario { background: var(--color-brand-600); }
+  .pulsante--primario:hover { background: var(--color-brand-800); }
+
+  .pulsante--contorno-chiaro { border: 1.5px solid var(--color-on-dark); }
+  .pulsante--contorno-chiaro:hover { background: var(--color-on-dark); color: var(--color-night); }
+
+  .pulsante__freccia { transition: transform 0.25s var(--ease-out); }
+  .pulsante:hover .pulsante__freccia { transform: translateX(3px); }
+
+  .pulsante:focus-visible { outline: 2px solid var(--color-brand-300); outline-offset: 3px; }
+</style>

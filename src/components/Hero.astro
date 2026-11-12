@@ -1,0 +1,121 @@
+---
+// Sezione Figma "Hero" (70:41).
+import Pulsante from './Pulsante.astro';
+const base = import.meta.env.BASE_URL;
+---
+
+<section class="hero">
+  <div class="hero__testi">
+    <div class="hero__titolo-testo">
+      <h1 class="hero__titolo" data-anima="titolo">
+        <span class="riga"><span>Lo studio che fa</span></span>
+        <span class="riga"><span>crescere la tua impresa</span></span>
+      </h1>
+      <p class="hero__sottotitolo" data-anima="entra">
+        Fisco, diritto, lavoro e strategia per le imprese di Verona e non solo.{' '}
+        <span class="accento">Un solo studio, quattro divisioni, persone che conoscono il tuo settore.</span>
+      </p>
+    </div>
+
+    <div class="hero__azioni" data-anima="entra">
+      <div class="hero__pulsanti">
+        <Pulsante href="#contatti">Parla con noi</Pulsante>
+        <Pulsante href="#consulenza" stile="contorno-chiaro" freccia={false}>Prenota una consulenza</Pulsante>
+      </div>
+
+      <a class="link-evento occhiello" href="#eventi">
+        <img class="link-evento__punto" src={`${base}/icone/punto.svg`} width="10" height="10" alt="" />
+        <span>Segui il<br />prossimo<br />evento</span>
+        <img class="link-evento__freccia" src={`${base}/icone/arrow-right.svg`} width="18" height="18" alt="" />
+      </a>
+    </div>
+  </div>
+
+  <div class="hero__immagine" data-anima="immagine" role="img" aria-label="Immagine in arrivo"></div>
+</section>
+
+<style>
+  .hero {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: var(--space-16);
+  }
+
+  .hero__testi {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .hero__titolo-testo { display: flex; flex-direction: column; gap: 18px; }
+
+  /* Stile "Display 3xl/Regular" */
+  .hero__titolo {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--display-3xl-size);
+    line-height: var(--display-3xl-lh);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .riga { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+  .riga > span { display: inline-block; }
+
+  /* Stile "Text lg/Regular" */
+  .hero__sottotitolo { margin: 0; max-width: 755px; font-size: var(--text-lg-size); line-height: var(--text-lg-lh); }
+  .accento { color: var(--color-brand-300); }
+
+  .hero__azioni {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+  }
+  .hero__pulsanti { display: flex; gap: var(--space-6); flex-wrap: wrap; }
+
+  .link-evento {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-align: right;
+  }
+  .link-evento__punto { animation: pulsa 2s ease-in-out infinite; }
+  .link-evento__freccia { transition: transform 0.25s var(--ease-out); }
+  .link-evento:hover .link-evento__freccia { transform: translateX(4px); }
+
+  @keyframes pulsa {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.8); }
+  }
+
+  .hero__immagine {
+    flex-shrink: 0;
+    width: 311px;
+    height: 389px;
+    border-radius: var(--radius-lg);
+    background: var(--color-placeholder);
+  }
+
+  @media (max-width: 1024px) {
+    .hero { padding: var(--space-10) var(--space-6); }
+    .hero__titolo { font-size: 56px; line-height: 1.05; white-space: normal; }
+    .hero__immagine { width: 240px; height: 300px; }
+  }
+
+  @media (max-width: 768px) {
+    .hero { flex-direction: column; align-items: stretch; gap: var(--space-10); padding-inline: 16px; }
+    .hero__titolo { font-size: 40px; white-space: normal; }
+    .hero__titolo .riga > span { display: inline; }
+    .hero__immagine { width: 100%; height: auto; aspect-ratio: 311 / 389; max-height: 320px; }
+    .link-evento { text-align: left; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .link-evento__punto { animation: none; }
+  }
+</style>
