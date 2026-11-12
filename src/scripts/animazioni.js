@@ -36,24 +36,39 @@ function animaHero() {
 }
 
 // 3. Immagine dell'evento: al passaggio del mouse si ingrandisce dall'angolo in alto a destra
-//    fin quasi a toccare la striscia dei loghi.
+//    fin quasi a toccare la striscia dei loghi. La scritta "Segui il prossimo evento"
+//    segue il bordo sinistro dell'immagine e la freccia sparisce.
 function ingrandisciImmagine() {
   const img = document.querySelector('[data-anima="immagine"]');
+  const link = document.querySelector('.link-evento');
+  const freccia = link?.querySelector('.link-evento__freccia');
   const loghi = document.querySelector('[data-striscia]');
-  if (!img || !loghi) return;
+  if (!img || !link || !freccia || !loghi) return;
   const conHover = window.matchMedia('(hover: hover) and (min-width: 769px)');
   const margine = 16; // spazio che resta tra immagine e loghi
 
-  img.addEventListener('mouseenter', () => {
+  const apri = () => {
     if (!conHover.matches) return;
-    const r = img.getBoundingClientRect();
-    const altezza = img.offsetHeight; // altezza senza l'ingrandimento in corso
-    const scala = Math.max(1, (loghi.getBoundingClientRect().top - margine - r.top) / altezza);
-    gsap.to(img, { scale: scala, duration: riduci ? 0 : 0.7, ease: 'power3.out', overwrite: 'auto' });
-  });
-  img.addEventListener('mouseleave', () => {
-    gsap.to(img, { scale: 1, duration: riduci ? 0 : 0.6, ease: 'power3.inOut', overwrite: 'auto' });
-  });
+    const top = img.getBoundingClientRect().top;
+    const altezza = img.offsetHeight; // misure senza l'ingrandimento in corso
+    const larghezza = img.offsetWidth;
+    const scala = Math.max(1, (loghi.getBoundingClientRect().top - margine - top) / altezza);
+    // La freccia sparisce: la scritta si sposta anche dello spazio che occupava.
+    const spazioFreccia = freccia.offsetWidth + parseFloat(getComputedStyle(link).columnGap || '0');
+    const d = riduci ? 0 : 0.7;
+    gsap.to(img, { scale: scala, duration: d, ease: 'power3.out', overwrite: 'auto' });
+    gsap.to(link, { x: -larghezza * (scala - 1) + spazioFreccia, duration: d, ease: 'power3.out', overwrite: 'auto' });
+    gsap.to(freccia, { opacity: 0, x: 8, duration: d * 0.4, overwrite: 'auto' });
+  };
+  const chiudi = () => {
+    const d = riduci ? 0 : 0.6;
+    gsap.to(img, { scale: 1, duration: d, ease: 'power3.inOut', overwrite: 'auto' });
+    gsap.to(link, { x: 0, duration: d, ease: 'power3.inOut', overwrite: 'auto' });
+    gsap.to(freccia, { opacity: 1, x: 0, duration: d * 0.5, delay: d * 0.5, overwrite: 'auto' });
+  };
+
+  img.addEventListener('mouseenter', apri);
+  img.addEventListener('mouseleave', chiudi);
 }
 
 animaHero();
