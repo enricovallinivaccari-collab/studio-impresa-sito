@@ -36,7 +36,7 @@ function animaHero() {
 }
 
 // 3. Immagine dell'evento: al passaggio del mouse si ingrandisce dall'angolo in alto a destra
-//    fin quasi a toccare la striscia dei loghi. La scritta "Segui il prossimo evento"
+//    fino a 380 px di larghezza (senza mai toccare i loghi). La scritta "Segui il prossimo evento"
 //    segue il bordo sinistro dell'immagine e la freccia sparisce.
 function ingrandisciImmagine() {
   const img = document.querySelector('[data-anima="immagine"]');
@@ -45,14 +45,16 @@ function ingrandisciImmagine() {
   const loghi = document.querySelector('[data-striscia]');
   if (!img || !link || !freccia || !loghi) return;
   const conHover = window.matchMedia('(hover: hover) and (min-width: 769px)');
-  const margine = 16; // spazio che resta tra immagine e loghi
+  const larghezzaFinale = 380; // px, scelta di Enrico
+  const margine = 16; // spazio minimo che resta tra immagine e loghi
 
   const apri = () => {
     if (!conHover.matches) return;
     const top = img.getBoundingClientRect().top;
     const altezza = img.offsetHeight; // misure senza l'ingrandimento in corso
     const larghezza = img.offsetWidth;
-    const scala = Math.max(1, (loghi.getBoundingClientRect().top - margine - top) / altezza);
+    const limiteLoghi = (loghi.getBoundingClientRect().top - margine - top) / altezza;
+    const scala = Math.max(1, Math.min(larghezzaFinale / larghezza, limiteLoghi));
     // La freccia sparisce: la scritta si sposta anche dello spazio che occupava.
     const spazioFreccia = freccia.offsetWidth + parseFloat(getComputedStyle(link).columnGap || '0');
     const d = riduci ? 0 : 0.7;
