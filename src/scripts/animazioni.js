@@ -35,5 +35,27 @@ function animaHero() {
     .from('.clienti', { opacity: 0, duration: 0.8 }, '-=0.5');
 }
 
+// 3. Immagine dell'evento: al passaggio del mouse si ingrandisce dall'angolo in alto a destra
+//    fin quasi a toccare la striscia dei loghi.
+function ingrandisciImmagine() {
+  const img = document.querySelector('[data-anima="immagine"]');
+  const loghi = document.querySelector('[data-striscia]');
+  if (!img || !loghi) return;
+  const conHover = window.matchMedia('(hover: hover) and (min-width: 769px)');
+  const margine = 16; // spazio che resta tra immagine e loghi
+
+  img.addEventListener('mouseenter', () => {
+    if (!conHover.matches) return;
+    const r = img.getBoundingClientRect();
+    const altezza = img.offsetHeight; // altezza senza l'ingrandimento in corso
+    const scala = Math.max(1, (loghi.getBoundingClientRect().top - margine - r.top) / altezza);
+    gsap.to(img, { scale: scala, duration: riduci ? 0 : 0.7, ease: 'power3.out', overwrite: 'auto' });
+  });
+  img.addEventListener('mouseleave', () => {
+    gsap.to(img, { scale: 1, duration: riduci ? 0 : 0.6, ease: 'power3.inOut', overwrite: 'auto' });
+  });
+}
+
 animaHero();
 avviaStriscia();
+ingrandisciImmagine();
