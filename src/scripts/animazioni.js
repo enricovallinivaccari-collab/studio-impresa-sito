@@ -105,14 +105,15 @@ function animaDivisioni() {
   const APERTA = 250;       // distanza tra i piani quando la pila è aperta
   const aperta = (i, k) => CENTRO + (i - k) * APERTA;
 
-  // Tempi in "vh di scroll": 100 per entrare, 70 di introduzione ferma (descrizione + pila schiacciata),
-  // 80 per divisione, 20 di coda. Deve tornare con l'altezza della sezione in Divisioni.astro.
+  // Tempi in "vh di scroll": 100 per entrare nello schermo, poi 6 tratti UGUALI da 80 a sezione ferma
+  // (introduzione + 5 divisioni). Il cambio avviene al confine tra un tratto e l'altro e il movimento
+  // è centrato sul confine. Deve tornare con l'altezza della sezione in Divisioni.astro (100vh + 6 × 80vh).
   const ENTRATA = 100;
-  const INTRO = 70;
-  const PER_DIVISIONE = 80;
-  const TOTALE = ENTRATA + INTRO + n * PER_DIVISIONE + 20;
-  const inizio = (k) => ENTRATA + INTRO + k * PER_DIVISIONE;
-  const MOSSA = 45; // durata del movimento tra un piano e l'altro
+  const TRATTO = 80;
+  const TOTALE = ENTRATA + (n + 1) * TRATTO;
+  const confine = (k) => ENTRATA + (k + 1) * TRATTO; // inizio del tratto della divisione k
+  const MOSSA = 44; // durata del movimento tra un piano e l'altro
+  const inizio = (k) => confine(k) - MOSSA / 2;
 
   const tl = gsap.timeline({ paused: true, defaults: { ease: 'power2.inOut' } });
   tl.set({}, {}, TOTALE);
@@ -164,7 +165,7 @@ function animaDivisioni() {
     sezione.toggleAttribute('data-in-corso', i >= 0);
     posiziona(i);
   };
-  const indiceDa = (tempo) => (tempo < inizio(0) + MOSSA / 2 ? -1 : Math.min(n - 1, Math.floor((tempo - inizio(0) - MOSSA / 2) / PER_DIVISIONE)));
+  const indiceDa = (tempo) => (tempo < confine(0) ? -1 : Math.min(n - 1, Math.floor((tempo - confine(0)) / TRATTO)));
 
   ScrollTrigger.create({
     trigger: sezione,
@@ -182,7 +183,7 @@ function animaDivisioni() {
   passi.forEach((p, i) => {
     p.querySelector('[data-vai]')?.addEventListener('click', () => {
       const partenza = sezione.getBoundingClientRect().top + window.scrollY - window.innerHeight;
-      const tempo = inizio(i) + MOSSA + 15;
+      const tempo = confine(i) + TRATTO / 2;
       window.scrollTo({ top: partenza + (tempo / TOTALE) * sezione.offsetHeight, behavior: riduci ? 'auto' : 'smooth' });
     });
   });
