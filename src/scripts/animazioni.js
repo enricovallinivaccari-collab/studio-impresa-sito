@@ -99,31 +99,58 @@ function animaDivisioni() {
   const n = lastre.length;
 
   // ---- Pila (unità del disegno 720×740; y = angolo alto del piano) ----
-  const SCHIACCIATA = 106;  // pila iniziale: centrata nel pannello, tutta colorata
-  const PASSO_STRETTO = 74;
-  const CENTRO = 236;       // dove sta il piano attivo
-  const APERTA = 250;       // distanza tra i piani quando la pila è aperta
-  const aperta = (i, k) => CENTRO + (i - k) * APERTA;
+  // Movimento misurato su griffin.com: i piani si muovono a velocità COSTANTE con lo scroll (niente pause,
+  // niente accelerazioni, nessun ritardo). Ogni piano aspetta compatto in basso scendendo piano piano,
+  // poi in due tratti sale veloce: arriva al centro e prosegue verso l'alto, dove si riaccoda compatto.
+  const INTRO_Y = 106;      // introduzione: pila centrata, aperta, tutta colorata
+  const INTRO_PASSO = 74;
+  const CENTRO = 236;       // il piano attivo passa da qui a metà del suo tratto
+  const APERTA = 250;       // quanto sale un piano in un tratto
+  const CODA = 45;          // distanza tra i piani in attesa (sopra e sotto)
 
   // Tempi in "vh di scroll": 100 per entrare nello schermo, poi 6 tratti UGUALI da 80 a sezione ferma
-  // (introduzione + 5 divisioni). Il cambio avviene al confine tra un tratto e l'altro e il movimento
-  // è centrato sul confine. Deve tornare con l'altezza della sezione in Divisioni.astro (100vh + 6 × 80vh).
+  // (introduzione + 5 divisioni). Deve tornare con l'altezza della sezione in Divisioni.astro (100vh + 6 × 80vh).
   const ENTRATA = 100;
   const TRATTO = 80;
   const TOTALE = ENTRATA + (n + 1) * TRATTO;
-  const confine = (k) => ENTRATA + (k + 1) * TRATTO; // inizio del tratto della divisione k
-  const MOSSA = 44; // durata del movimento tra un piano e l'altro
-  const inizio = (k) => confine(k) - MOSSA / 2;
+  const confine = (k) => ENTRATA + (k + 1) * TRATTO; // inizio del tratto della divisione k (cambia il testo)
+  const centro = (k) => confine(k) + TRATTO / 2;      // il piano k è esattamente al centro
 
-  const tl = gsap.timeline({ paused: true, defaults: { ease: 'power2.inOut' } });
-  tl.set({}, {}, TOTALE);
-  corpi.forEach((c, i) => tl.fromTo(c, { y: 0 }, { y: SCHIACCIATA + i * PASSO_STRETTO - yDisegno[i], duration: 90 }, 0));
-  for (let k = 0; k < n; k++) {
-    const t = inizio(k);
-    corpi.forEach((c, i) => tl.to(c, { y: aperta(i, k) - yDisegno[i], duration: MOSSA }, t));
-    if (k > 0) tl.to(note[k - 1], { opacity: 0, duration: 10 }, t);
-    tl.fromTo(note[k], { opacity: 0 }, { opacity: 1, duration: 14, ease: 'none' }, t + MOSSA - 12);
-  }
+  // Posizione del piano i quando il piano m è al centro.
+  const modello = (i, m) => {
+    if (i === m) return CENTRO;
+    if (i > m) return CENTRO + APERTA + (i - m - 1) * CODA;
+    return CENTRO - APERTA - (m - i - 1) * CODA;
+  };
+  // Punti chiave [tempo, y] di ogni piano; tra un punto e l'altro si va in linea retta.
+  const chiavi = lastre.map((_, i) => {
+    const k = [[0, yDisegno[i]], [90, INTRO_Y + i * INTRO_PASSO], [ENTRATA + TRATTO / 2, INTRO_Y + i * INTRO_PASSO]];
+    for (let m = 0; m < n; m++) k.push([centro(m), modello(i, m)]);
+    k.push([TOTALE, modello(i, n - 1)]);
+    return k;
+  });
+  const interpola = (k, t) => {
+    if (t <= k[0][0]) return k[0][1];
+    for (let j = 1; j < k.length; j++) {
+      if (t <= k[j][0]) {
+        const [t0, y0] = k[j - 1], [t1, y1] = k[j];
+        return y0 + ((y1 - y0) * (t - t0)) / (t1 - t0);
+      }
+    }
+    return k[k.length - 1][1];
+  };
+  // Le descrizioni compaiono mentre il piano si avvicina al centro e spariscono quando lo supera.
+  const rampa = (t, a, b) => Math.min(1, Math.max(0, (t - a) / (b - a)));
+  const opacitaNota = (k, t) => {
+    const entra = rampa(t, centro(k) - 35, centro(k) - 18);
+    const esce = k === n - 1 ? 0 : rampa(t, centro(k) + 22, centro(k) + 38);
+    return entra * (1 - esce);
+  };
+
+  const disegna = (t) => {
+    corpi.forEach((c, i) => c.setAttribute('transform', `translate(0 ${(interpola(chiavi[i], t) - yDisegno[i]).toFixed(2)})`));
+    note.forEach((nota, k) => { nota.style.opacity = opacitaNota(k, t).toFixed(3); });
+  };
 
   // ---- Colonna testo ----
   const desktop = window.matchMedia('(min-width: 769px)');
@@ -167,14 +194,18 @@ function animaDivisioni() {
   };
   const indiceDa = (tempo) => (tempo < confine(0) ? -1 : Math.min(n - 1, Math.floor((tempo - confine(0)) / TRATTO)));
 
+  // Lo scroll comanda tutto direttamente, fotogramma per fotogramma (come Griffin, nessun ritardo).
   ScrollTrigger.create({
     trigger: sezione,
     start: 'top bottom',
     end: 'bottom bottom',
-    scrub: riduci ? true : 0.8,
-    animation: tl,
+    onUpdate: (self) => {
+      const t = self.progress * TOTALE;
+      disegna(t);
+      attiva(indiceDa(t));
+    },
   });
-  tl.eventCallback('onUpdate', () => attiva(indiceDa(tl.time())));
+  disegna(0);
   attiva(-1);
   posiziona(-1, true);
   window.addEventListener('resize', () => posiziona(attivo, true));
@@ -183,7 +214,7 @@ function animaDivisioni() {
   passi.forEach((p, i) => {
     p.querySelector('[data-vai]')?.addEventListener('click', () => {
       const partenza = sezione.getBoundingClientRect().top + window.scrollY - window.innerHeight;
-      const tempo = confine(i) + TRATTO / 2;
+      const tempo = centro(i);
       window.scrollTo({ top: partenza + (tempo / TOTALE) * sezione.offsetHeight, behavior: riduci ? 'auto' : 'smooth' });
     });
   });
