@@ -1,6 +1,7 @@
 @import '@fontsource-variable/dm-sans/opsz.css';
 @import '@fontsource/inter/400.css';
 @import '@fontsource/atkinson-hyperlegible-mono/400.css';
+@import '@fontsource/atkinson-hyperlegible-mono/500.css';
 @import './tokens.css';
 
 *, *::before, *::after { box-sizing: border-box; }

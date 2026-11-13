@@ -155,7 +155,15 @@ function animaDivisioni() {
   // ---- Colonna testo ----
   const desktop = window.matchMedia('(min-width: 769px)');
   if (desktop.matches) testo.setAttribute('data-pronto', '');
-  const RIGA = 28; // altezza di una voce chiusa
+  const RIGA = 36; // passo tra le voci chiuse (badge alto 28 + 8)
+  // La voce attiva sta a un terzo dell'altezza, ma se titolo + testo + pulsante sono alti sale,
+  // per non toccare le voci che seguono in fondo.
+  const yAttiva = (p, k, alto) => {
+    const testa = p.querySelector('.passo__testa').offsetHeight;
+    const corpo = p.querySelector('.passo__corpo > div').scrollHeight;
+    const primaSotto = alto - (n - k - 1) * RIGA;
+    return Math.max(0, Math.min(alto * 0.36, primaSotto - 32 - testa - corpo));
+  };
   const posiziona = (k, subito) => {
     if (!desktop.matches) return;
     const alto = elenco.clientHeight;
@@ -164,15 +172,14 @@ function animaDivisioni() {
       let y;
       if (k < 0) y = alto - (n - i) * RIGA;            // introduzione: tutte in fondo
       else if (i < k) y = i * RIGA;                     // già viste: in alto
-      else if (i === k) y = alto * 0.36;                // attiva: al centro
+      else if (i === k) y = yAttiva(p, k, alto);         // attiva: al centro (più su se è alta)
       else y = alto - (n - i) * RIGA;                   // prossime: in fondo
       gsap.to(p, { y, duration: d, ease: 'power3.inOut', overwrite: 'auto' });
     });
     gsap.to(intro, { autoAlpha: k < 0 ? 1 : 0, yPercent: k < 0 ? -60 : -90, duration: d, ease: 'power2.out', overwrite: 'auto' });
     if (avanzamento) {
       gsap.to(avanzamento, {
-        scaleY: k < 0 ? 0 : (k * RIGA + alto * 0.36 + 10) / alto,
-        backgroundColor: k < 0 ? '#4f8fcc' : passi[k].dataset.colore,
+        scaleY: k < 0 ? 0 : (yAttiva(passi[k], k, alto) + 14) / alto,
         duration: d, ease: 'power3.inOut', overwrite: 'auto',
       });
     }

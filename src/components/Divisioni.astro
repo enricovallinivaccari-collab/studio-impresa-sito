@@ -1,4 +1,6 @@
 ---
+import Pulsante from './Pulsante.astro';
+
 // Sezione Figma "Divisioni" (frame 80:1175 nella pagina di Enrico) con il componente
 // "Illustrazione divisioni" (pagina Illustrazioni): pila isometrica, un piano per divisione.
 // Scorrendo, la sezione resta ferma, la lista avanza e il piano della divisione attiva
@@ -124,12 +126,16 @@ const dalBasso = [...lastre].reverse();
           <li class={`passo${i === 0 ? ' is-attivo' : ''}`} data-passo={i} style={`--punto:${d.scala[400]}`} data-colore={d.scala[400]}>
             <button class="passo__testa" type="button" data-vai={i} aria-expanded={i === 0 ? 'true' : 'false'}>
               <span class="passo__punto" aria-hidden="true"></span>
-              <span class="passo__nome">{d.n}<span aria-hidden="true">&nbsp;&nbsp;</span>{d.nome}</span>
+              <span class="passo__badge">{d.n}<span aria-hidden="true">&nbsp;&nbsp;</span>{d.nome}</span>
             </button>
             <div class="passo__corpo">
               <div>
                 <h3 class="passo__titolo">{d.titolo}</h3>
                 <p class="passo__testo">{d.testo}</p>
+                {/* Pagina della divisione ancora da fare: il link è un segnaposto. */}
+                <div class="passo__azione">
+                  <Pulsante href={`#divisione-${d.chiave}`} stile="contorno-chiaro" dimensione="piccola">Scopri {d.nome}</Pulsante>
+                </div>
               </div>
             </div>
           </li>
@@ -306,22 +312,30 @@ const dalBasso = [...lastre].reverse();
     cursor: pointer;
     text-align: left;
   }
+  /* Pallini e linea neutri; il colore della divisione sta nel badge (componente Tag, toni divisione). */
   .passo__punto {
     width: 10px; height: 10px; flex: none;
     border-radius: 50%;
-    background: var(--color-brand-800);
+    background: var(--g700);
     transition: background-color 0.5s, transform 0.5s var(--ease-out);
   }
-  .passo__nome {
+  .passo__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    background: var(--punto);
+    color: var(--color-night);
     font-family: var(--font-mono);
+    font-weight: 500;
     font-size: var(--text-sm-size);
-    line-height: var(--text-sm-lh);
+    line-height: 20px;
     text-transform: uppercase;
-    transition: color 0.4s;
+    white-space: nowrap;
+    transition: filter 0.25s;
   }
-  .passo.is-attivo .passo__punto { background: var(--punto); transform: scale(1.2); }
-  .passo.is-attivo .passo__nome { color: var(--color-on-dark); }
-  .passo__testa:hover .passo__nome { color: var(--color-on-dark); }
+  .passo.is-attivo .passo__punto { background: var(--color-on-dark); transform: scale(1.2); }
+  .passo__testa:hover .passo__badge { filter: brightness(1.12); }
   .passo__testa:focus-visible { outline: 2px solid var(--color-brand-400); outline-offset: 4px; border-radius: 4px; }
 
   /* Il corpo si apre solo per la divisione attiva. */
@@ -342,6 +356,7 @@ const dalBasso = [...lastre].reverse();
     letter-spacing: -0.01em;
   }
   .passo__testo { margin: 0; max-width: 480px; font-size: var(--text-lg-size); line-height: 22px; color: var(--color-brand-300); }
+  .passo__azione { margin-top: var(--space-6); padding-bottom: 2px; }
 
   .divisioni__lead { margin: var(--space-3) 0 0; max-width: 440px; color: var(--color-brand-300); }
   .passi__linea { display: none; }
@@ -359,7 +374,7 @@ const dalBasso = [...lastre].reverse();
       display: block; position: absolute; left: 24px; top: var(--space-8); bottom: var(--space-8);
       width: 1px; background: var(--g800);
     }
-    .passi__avanzamento { position: absolute; left: 0; top: 0; width: 1px; height: 100%; background: var(--color-brand-400); transform-origin: top; transform: scaleY(0); }
+    .passi__avanzamento { position: absolute; left: 0; top: 0; width: 1px; height: 100%; background: #a1adb5; transform-origin: top; transform: scaleY(0); }
     .divisioni__testo[data-pronto] .passo__testa { margin-left: -45px; gap: 35px; }
     .divisioni__testo[data-pronto] .passo__corpo > div { padding-left: 0; }
   }
@@ -445,6 +460,10 @@ const dalBasso = [...lastre].reverse();
     .divisioni__lead { display: none; }
     .passo__titolo { font-size: 22px; }
     .passo__testo { font-size: 16px; }
+    .passi { gap: var(--space-2); }
+    .passo__azione { margin-top: var(--space-3); }
+    .passo.is-attivo, .passo:has(+ .passo.is-attivo) { margin-bottom: var(--space-2); }
+    .passo__titolo { margin-top: var(--space-2); }
   }
 
   @media (prefers-reduced-motion: reduce) {
