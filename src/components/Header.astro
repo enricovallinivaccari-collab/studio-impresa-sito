@@ -1,5 +1,11 @@
 ---
-// Componente Figma "Header" (Desktop, tema Scuro) con le voci "Voce menu".
+// Componente Figma "Header" (Desktop, tema Scuro) + "Header collapse" (Figma 80:1158).
+// Comportamento copiato da griffin.com (misurato il 13/11):
+// - la barra con logo e "Area clienti" non è fissa: scorre via con la pagina;
+// - il menu è sempre fisso in alto al centro, sopra la barra, con sfondo sfocato;
+// - oltre 100 px di scroll nel menu entra "Area clienti" (larghezza 0,3 s e opacità 0,32 s,
+//   curva cubic-bezier(0.4, 0, 0.2, 1)); tornando sopra i 100 px esce;
+// - al passaggio del mouse una sola pillola scivola da una voce all'altra (0,23 s).
 import Pulsante from './Pulsante.astro';
 
 const base = import.meta.env.BASE_URL;
@@ -17,20 +23,72 @@ const voci = [
     <img src={`${base}/logo-negativo.svg`} width="135" height="43" alt="Studio Impresa" />
   </a>
 
-  <nav class="header__menu" aria-label="Menu principale">
-    {voci.map((v) => <a class="voce-menu occhiello" href={v.href}>{v.testo}</a>)}
-  </nav>
-
   <div class="header__azioni">
     <Pulsante href="#area-clienti" dimensione="piccola" freccia={false}>Area clienti</Pulsante>
     <button class="header__menu-mobile occhiello" type="button" aria-label="Apri il menu">Menu</button>
   </div>
 </header>
 
+<nav class="menu" aria-label="Menu principale" data-menu>
+  <ul class="menu__lista">
+    <li class="menu__pillola" aria-hidden="true" data-pillola></li>
+    {voci.map((v) => (
+      <li><a class="voce-menu occhiello" href={v.href} data-voce>{v.testo}</a></li>
+    ))}
+    <li class="menu__extra" data-extra>
+      <div class="menu__extra-dentro">
+        <Pulsante href="#area-clienti" dimensione="piccola" freccia={false}>Area clienti</Pulsante>
+      </div>
+    </li>
+  </ul>
+</nav>
+
+<script>
+  const SOGLIA = 100; // px di scroll, come griffin.com
+
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const lista = menu?.querySelector<HTMLElement>('.menu__lista');
+  const pillola = menu?.querySelector<HTMLElement>('[data-pillola]');
+
+  if (menu && lista && pillola) {
+    // 1. Compatta: "Area clienti" entra nel menu dopo SOGLIA px.
+    const aggiorna = () => menu.classList.toggle('is-compatto', window.scrollY > SOGLIA);
+    aggiorna();
+    window.addEventListener('scroll', aggiorna, { passive: true });
+
+    // 2. Pillola che scivola sotto la voce indicata.
+    let visibile = false;
+    const vaiSu = (voce: HTMLElement) => {
+      const l = lista.getBoundingClientRect();
+      const r = voce.getBoundingClientRect();
+      if (!visibile) pillola.classList.add('senza-transizione'); // la prima volta compare sul posto
+      pillola.style.left = `${r.left - l.left}px`;
+      pillola.style.top = `${r.top - l.top}px`;
+      pillola.style.width = `${r.width}px`;
+      pillola.style.height = `${r.height}px`;
+      pillola.getBoundingClientRect();
+      pillola.classList.remove('senza-transizione');
+      pillola.classList.add('is-visibile');
+      visibile = true;
+    };
+    const nascondi = () => {
+      pillola.classList.remove('is-visibile');
+      visibile = false;
+    };
+
+    lista.querySelectorAll<HTMLElement>('[data-voce]').forEach((voce) => {
+      voce.addEventListener('mouseenter', () => vaiSu(voce));
+      voce.addEventListener('focus', () => vaiSu(voce));
+      voce.addEventListener('blur', nascondi);
+    });
+    lista.addEventListener('mouseleave', nascondi);
+    lista.querySelector('[data-extra]')?.addEventListener('mouseenter', nascondi);
+  }
+</script>
+
 <style>
   .header {
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 10;
     display: flex;
     align-items: center;
@@ -41,22 +99,6 @@ const voci = [
   }
 
   .header__logo img { width: 135px; height: auto; }
-
-  .header__menu { display: flex; gap: var(--space-3); }
-
-  /* Componente "Voce menu": hover = pillola Brand 800 con testo crema */
-  .voce-menu {
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-full);
-    color: var(--color-on-dark);
-    transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out);
-  }
-  .voce-menu:hover,
-  .voce-menu:focus-visible {
-    background: var(--color-brand-800);
-    color: var(--color-cream);
-    outline: none;
-  }
 
   .header__azioni { display: flex; align-items: center; gap: var(--space-6); }
 
@@ -70,9 +112,85 @@ const voci = [
     cursor: pointer;
   }
 
+  /* Menu fisso: le voci restano esattamente dove sono nell'header (y = 17 px). */
+  .menu {
+    position: fixed;
+    top: 9px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+  }
+
+  /* "Header collapse": pillola 52 px, padding 8/10, fondo Night 50% + sfocatura 10 px.
+     In cima alla pagina sta sopra la barra Night, quindi non si vede (come su Griffin). */
+  .menu__lista {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: 0;
+    padding: var(--space-2) var(--space-2-5);
+    list-style: none;
+    border-radius: var(--radius-full);
+    background: rgba(4, 15, 21, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .menu__pillola {
+    position: absolute;
+    z-index: -1;
+    border-radius: var(--radius-full);
+    background: var(--menu-hover, #232b30);
+    opacity: 0;
+    scale: 0.9;
+    pointer-events: none;
+    transition-property: left, top, width, height, scale, opacity;
+    transition-duration: 0.23s;
+    transition-timing-function: cubic-bezier(0.3, 0.76, 0.27, 1);
+  }
+  .menu__pillola.is-visibile { opacity: 1; scale: 1; }
+  .menu__pillola.senza-transizione { transition-property: scale, opacity; }
+
+  /* Componente "Voce menu": testo bianco, al passaggio crema sulla pillola */
+  .voce-menu {
+    display: block;
+    white-space: nowrap;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-full);
+    color: var(--color-on-dark);
+    transition: color 0.23s cubic-bezier(0.3, 0.76, 0.27, 1);
+  }
+  .voce-menu:hover,
+  .voce-menu:focus-visible { color: var(--color-cream); outline: none; }
+
+  /* "Area clienti" nel menu: chiusa a larghezza 0, si apre dopo la soglia. */
+  .menu__extra {
+    display: grid;
+    grid-template-columns: 0fr;
+    margin-left: calc(-1 * var(--space-3)); /* annulla lo spazio quando è chiusa */
+    opacity: 0;
+    transition:
+      grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .menu__extra-dentro {
+    min-width: 0;
+    overflow: clip;
+    padding-left: var(--space-3);
+    display: flex;
+  }
+  .menu.is-compatto .menu__extra,
+  .menu__extra:focus-within { grid-template-columns: 1fr; opacity: 1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu__extra, .menu__pillola { transition-duration: 0.01s; }
+  }
+
   @media (max-width: 1024px) {
     .header { padding-inline: var(--space-6); }
-    .header__menu { display: none; }
+    .menu { display: none; }
     .header__menu-mobile { display: inline-block; }
   }
 
