@@ -1,5 +1,8 @@
 // Prime animazioni della homepage, con GSAP.
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const riduci = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -73,6 +76,60 @@ function ingrandisciImmagine() {
   img.addEventListener('mouseleave', chiudi);
 }
 
+// 4. Sezione Divisioni (come la sezione a passi di Griffin): la sezione resta ferma mentre scorri,
+//    la lista passa da 01 Tax a 05 ETS e nella pila si alza e si colora il piano della divisione attiva.
+function animaDivisioni() {
+  const sezione = document.querySelector('[data-divisioni]');
+  if (!sezione) return;
+  const fermo = sezione.querySelector('.divisioni__fermo');
+  const passi = [...sezione.querySelectorAll('[data-passo]')];
+  const lastre = [...sezione.querySelectorAll('[data-lastra]')];
+  const n = passi.length;
+  let attivo = 0;
+
+  const attiva = (i) => {
+    if (i === attivo) return;
+    attivo = i;
+    passi.forEach((p, k) => {
+      p.classList.toggle('is-attivo', k === i);
+      p.querySelector('[data-vai]')?.setAttribute('aria-expanded', String(k === i));
+    });
+    lastre.forEach((l) => l.classList.toggle('is-attiva', Number(l.dataset.lastra) === i));
+  };
+
+  const altoHeader = () => fermo.getBoundingClientRect().top <= 0 ? 0 : parseFloat(getComputedStyle(fermo).top) || 0;
+
+  ScrollTrigger.create({
+    trigger: sezione,
+    start: () => `top top+=${altoHeader()}`,
+    end: 'bottom bottom',
+    invalidateOnRefresh: true,
+    onUpdate: (self) => attiva(Math.min(n - 1, Math.floor(self.progress * n))),
+  });
+
+  // Clic su una divisione: scorre fino al suo tratto.
+  passi.forEach((p, i) => {
+    p.querySelector('[data-vai]')?.addEventListener('click', () => {
+      const inizio = sezione.getBoundingClientRect().top + window.scrollY - altoHeader();
+      const corsa = sezione.offsetHeight - fermo.offsetHeight;
+      window.scrollTo({ top: inizio + ((i + 0.5) / n) * corsa, behavior: riduci ? 'auto' : 'smooth' });
+    });
+  });
+
+  // Entrata: i piani arrivano dall'alto uno alla volta, dal basso verso l'alto, e si impilano.
+  if (!riduci) {
+    gsap.from(sezione.querySelectorAll('.lastra'), {
+      y: -60,
+      opacity: 0,
+      duration: 0.9,
+      ease: 'power3.out',
+      stagger: 0.12,
+      scrollTrigger: { trigger: sezione, start: 'top 65%', once: true },
+    });
+  }
+}
+
 animaHero();
 avviaStriscia();
 ingrandisciImmagine();
+animaDivisioni();

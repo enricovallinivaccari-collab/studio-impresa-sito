@@ -10,7 +10,7 @@ Si aggiorna da sola a ogni modifica sul ramo `main` (GitHub Actions → GitHub P
 ## Com'è fatto
 
 - [Astro](https://astro.build): ogni pezzo del Figma è un componente in `src/components/`
-  (`Header`, `Pulsante`, `Hero`, `StrisciaLoghi`).
+  (`Header`, `Pulsante`, `Hero`, `StrisciaLoghi`, `Divisioni`).
 - Colori, font e spaziature del Figma sono in `src/styles/tokens.css`.
 - Font: DM Sans (titoli), Inter (testo), Atkinson Hyperlegible Mono (menu, pulsanti, occhielli).
 - Animazioni con [GSAP](https://gsap.com) in `src/scripts/animazioni.js`.

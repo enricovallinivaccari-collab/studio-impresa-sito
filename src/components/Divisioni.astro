@@ -1,0 +1,363 @@
+---
+// Sezione Figma "Divisioni" (frame 80:1175 nella pagina di Enrico) con il componente
+// "Illustrazione divisioni" (pagina Illustrazioni): pila isometrica, un piano per divisione.
+// Scorrendo, la sezione resta ferma, la lista avanza e il piano della divisione attiva
+// si alza e prende i suoi colori. I testi di Legal, Job, Advisory ed ETS sono provvisori.
+
+const divisioni = [
+  {
+    chiave: 'tax', n: '01', nome: 'Tax',
+    titolo: 'Fisco e bilancio, senza sorprese',
+    testo: 'Dichiarazioni, bilanci, revisione e finanza agevolata. Ti diciamo prima cosa succede, non dopo.',
+    scala: { 300: '#9CC7F3', 400: '#73ABE2', 500: '#4F8FCC', 600: '#3474B0', 700: '#225E93', 800: '#174B78' },
+  },
+  {
+    chiave: 'legal', n: '02', nome: 'Legal',
+    titolo: 'Contratti e società, scritti bene',
+    testo: 'Contratti, diritto societario, recupero crediti e contenzioso. Per firmare tranquilli.',
+    scala: { 300: '#89D3CD', 400: '#53BAB3', 500: '#06A099', 600: '#09827D', 700: '#076965', 800: '#005450' },
+  },
+  {
+    chiave: 'job', n: '03', nome: 'Job',
+    titolo: 'Persone e paghe in ordine',
+    testo: 'Buste paga, contratti di lavoro, welfare e relazioni sindacali. Ogni mese, puntuali.',
+    scala: { 300: '#FFBA70', 400: '#F4991A', 500: '#D18001', 600: '#AB6906', 700: '#8B5401', 800: '#704302' },
+  },
+  {
+    chiave: 'advisory', n: '04', nome: 'Advisory',
+    titolo: 'Strategia per crescere',
+    testo: 'Controllo di gestione, operazioni straordinarie e passaggi generazionali. Numeri chiari per le scelte importanti.',
+    scala: { 300: '#CBDC6B', 400: '#B4C709', 500: '#99A901', 600: '#7C8A01', 700: '#647002', 800: '#505900' },
+  },
+  {
+    chiave: 'ets', n: '05', nome: 'ETS',
+    titolo: 'Al fianco del terzo settore',
+    testo: 'Statuti e iscrizione al RUNTS, bilanci, 5 per mille e raccolta fondi per associazioni e fondazioni.',
+    scala: { 300: '#97DBB6', 400: '#6AC697', 500: '#3CAD79', 600: '#0F905E', 700: '#06754B', 800: '#045E3B' },
+  },
+];
+
+// Geometria isometrica, uguale al Figma: piano 220×220, spessore 12, un piano ogni 114 px.
+const c = Math.cos(Math.PI / 6);
+const s = 0.5;
+const W = 220, T = 12, CX = 360, GAP = 114, Y0 = 22;
+const P = (y: number, u: number, v: number) => [CX + (u - v) * c, y + (u + v) * s];
+const punti = (pts: number[][]) => pts.map((p) => p.map((n) => n.toFixed(2)).join(',')).join(' ');
+
+const lastre = divisioni.map((d, i) => {
+  const y = Y0 + i * GAP;
+  const L = P(y, 0, W), B = P(y, W, W), R = P(y, W, 0);
+  return {
+    ...d,
+    i,
+    piano: `matrix(${c} ${s} ${-c} ${s} ${CX} ${y})`,
+    sinistro: punti([L, B, [B[0], B[1] + T], [L[0], L[1] + T]]),
+    destro: punti([B, R, [R[0], R[1] + T], [B[0], B[1] + T]]),
+    colori: Object.entries(d.scala).map(([k, v]) => `--x${k}:${v}`).join(';'),
+  };
+});
+// Si disegnano dal basso: il piano sopra copre quello sotto.
+const dalBasso = [...lastre].reverse();
+---
+
+<section class="divisioni" data-divisioni aria-labelledby="divisioni-titolo" style={`--passi:${divisioni.length}`}>
+  <div class="divisioni__fermo">
+    <div class="divisioni__testo">
+      <div class="divisioni__intestazione">
+        <p class="occhiello divisioni__occhiello">Le nostre divisioni</p>
+        <h2 id="divisioni-titolo" class="divisioni__titolo">5 anime, un solo studio</h2>
+      </div>
+
+      <ol class="passi">
+        {divisioni.map((d, i) => (
+          <li class={`passo${i === 0 ? ' is-attivo' : ''}`} data-passo={i} style={`--punto:${d.scala[400]}`}>
+            <button class="passo__testa" type="button" data-vai={i} aria-expanded={i === 0 ? 'true' : 'false'}>
+              <span class="passo__punto" aria-hidden="true"></span>
+              <span class="passo__nome">{d.n}<span aria-hidden="true">&nbsp;&nbsp;</span>{d.nome}</span>
+            </button>
+            <div class="passo__corpo">
+              <div>
+                <h3 class="passo__titolo">{d.titolo}</h3>
+                <p class="passo__testo">{d.testo}</p>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <div class="divisioni__figura" aria-hidden="true">
+      <svg viewBox="0 0 720 740" role="presentation" focusable="false">
+        <defs>
+          <pattern id="griglia-punti" width="24" height="24" patternUnits="userSpaceOnUse">
+            <circle class="griglia" cx="13" cy="13" r="1" />
+          </pattern>
+        </defs>
+        <rect width="720" height="740" fill="url(#griglia-punti)" />
+
+        {dalBasso.map((l) => (
+          <g class={`lastra${l.i === 0 ? ' is-attiva' : ''}`} data-lastra={l.i} style={l.colori}>
+            <g class="lastra__corpo">
+              <polygon class="lato" points={l.sinistro} />
+              <polygon class="lato" points={l.destro} />
+              <g transform={l.piano}>
+                <rect class="superficie" width={W} height={W} />
+
+                {l.chiave === 'tax' && (
+                  <g>
+                    <rect class="f-in" x="16" y="16" width="188" height="84" rx="2" />
+                    <rect class="f4" x="24" y="26" width="70" height="8" rx="4" />
+                    <rect class="fd" x="24" y="42" width="120" height="6" rx="3" />
+                    <rect class="fd" x="24" y="56" width="96" height="6" rx="3" />
+                    <rect class="f-in" x="16" y="108" width="188" height="74" rx="2" />
+                    <rect class="f8 barra" x="30" y="156" width="24" height="18" />
+                    <rect class="f7 barra" x="64" y="146" width="24" height="28" />
+                    <rect class="f6 barra" x="98" y="152" width="24" height="22" />
+                    <rect class="f5 barra" x="132" y="136" width="24" height="38" />
+                    <rect class="f4 barra" x="166" y="120" width="24" height="54" />
+                  </g>
+                )}
+
+                {l.chiave === 'legal' && (
+                  <g>
+                    <rect class="f-in s7" x="108" y="14" width="96" height="128" rx="2" />
+                    <rect class="fd" x="120" y="28" width="52" height="5" rx="2.5" />
+                    <rect class="fd" x="120" y="42" width="72" height="5" rx="2.5" />
+                    <rect class="fd" x="120" y="54" width="64" height="5" rx="2.5" />
+                    <rect class="fd" x="120" y="66" width="70" height="5" rx="2.5" />
+                    <rect class="fd" x="120" y="78" width="40" height="5" rx="2.5" />
+                    <circle class="f5" cx="173" cy="115" r="19" />
+                    <circle class="anello" cx="173" cy="115" r="13" />
+                    <path class="tratto s4" d="M20 164 C28 150 34 150 36 160 C38 170 44 170 48 158 C52 148 58 152 60 162 C62 170 70 168 76 158 L96 158" />
+                    <rect class="f7" x="20" y="176" width="76" height="1.5" />
+                  </g>
+                )}
+
+                {l.chiave === 'job' && (
+                  <g>
+                    {[0, 1, 2].flatMap((a) => [0, 1].map((b) => {
+                      const x = 110 + a * 32, y = 18 + b * 52, on = (a + b) % 2 === 0;
+                      return (
+                        <g>
+                          <circle class={on ? 'f4' : 'f7'} cx={x + 16} cy={y + 8} r="8" />
+                          <path class={on ? 'f5' : 'f8'} d={`M${x} ${y + 36} V${y + 32} a12 12 0 0 1 12 -12 h4 a12 12 0 0 1 12 12 V${y + 36} Z`} />
+                        </g>
+                      );
+                    }))}
+                    <rect class="f-in" x="16" y="124" width="188" height="60" rx="2" />
+                    {[0, 1, 2, 3, 4, 5, 6].flatMap((a) => [0, 1, 2].map((b) => {
+                      const on = (a === 2 && b === 1) || (a === 5 && b === 2);
+                      return <rect class={on ? 'f4' : 'fd'} x={26 + a * 25} y={132 + b * 17} width="18" height="12" rx="2" />;
+                    }))}
+                  </g>
+                )}
+
+                {l.chiave === 'advisory' && (
+                  <g>
+                    <circle class="anello-s s7" cx="172" cy="52" r="32" />
+                    <circle class="anello-s s5" cx="172" cy="52" r="23" />
+                    <circle class="anello-s s5" cx="172" cy="52" r="14" />
+                    <circle class="f4" cx="172" cy="52" r="5" />
+                    <rect class="f-in" x="16" y="110" width="188" height="76" rx="2" />
+                    <path class="tratto s4" d="M28 174 L62 162 L90 168 L124 144 L156 150 L192 124" />
+                    <path class="f4" d="M182 118 L194 120 L188 130 Z" />
+                  </g>
+                )}
+
+                {l.chiave === 'ets' && (
+                  <g>
+                    <circle class="anello-s s7 tratteggio" cx="162" cy="58" r="44" />
+                    <path class="f4" d="M162 78 C162 78 134 60 134 43 C134 34 141 28 149 28 C155 28 160 32 162 36 C164 32 169 28 175 28 C183 28 190 34 190 43 C190 60 162 78 162 78 Z" />
+                    <rect class="f-in" x="16" y="118" width="188" height="66" rx="2" />
+                    {Array.from({ length: 9 }).flatMap((_, a) => [0, 1, 2].map((b) => (
+                      <circle class={(a * 3 + b) % 4 === 0 ? 'f4' : 'fd'} cx={31 + a * 20} cy={133 + b * 18} r="5" />
+                    )))}
+                  </g>
+                )}
+
+                <text class="etichetta" x="16" y="211">{l.n} {l.nome.toUpperCase()}</text>
+              </g>
+            </g>
+          </g>
+        ))}
+      </svg>
+    </div>
+  </div>
+</section>
+
+<style>
+  .divisioni {
+    /* Scala dei grigi (Colors/Gray) usata per i piani spenti. */
+    --g600: #5f7381;
+    --g700: #3f596a;
+    --g800: #1b3d53;
+    --g900: #002337;
+    --g950: #001224;
+    --pannello: #081319;
+    --alto-header: 70px;
+    position: relative;
+    /* Un tratto di scorrimento per ogni divisione, mentre la sezione resta ferma. */
+    height: calc(100vh + (var(--passi) - 1) * 70vh);
+  }
+
+  .divisioni__fermo {
+    position: sticky;
+    top: var(--alto-header);
+    height: calc(100vh - var(--alto-header));
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+  }
+
+  /* ---------- Colonna testo ---------- */
+  .divisioni__testo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+    padding: var(--space-24) var(--space-16);
+    min-width: 0;
+  }
+  .divisioni__intestazione { display: flex; flex-direction: column; gap: 6px; }
+  .divisioni__occhiello { font-size: var(--text-xs-size); line-height: var(--text-xs-lh); letter-spacing: 0.06em; color: var(--color-brand-300); }
+  .divisioni__titolo {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+  }
+
+  .passi { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); max-width: 592px; }
+  .passo.is-attivo { margin-bottom: var(--space-6); }
+  .passo:has(+ .passo.is-attivo) { margin-bottom: var(--space-6); }
+
+  .passo__testa {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4, 16px);
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-brand-300);
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
+  }
+  .passo__punto {
+    width: 10px; height: 10px; flex: none;
+    border-radius: 50%;
+    background: var(--color-brand-800);
+    transition: background-color 0.5s, transform 0.5s var(--ease-out);
+  }
+  .passo__nome {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm-size);
+    line-height: var(--text-sm-lh);
+    text-transform: uppercase;
+    transition: color 0.4s;
+  }
+  .passo.is-attivo .passo__punto { background: var(--punto); transform: scale(1.2); }
+  .passo.is-attivo .passo__nome { color: var(--color-on-dark); }
+  .passo__testa:hover .passo__nome { color: var(--color-on-dark); }
+  .passo__testa:focus-visible { outline: 2px solid var(--color-brand-400); outline-offset: 4px; border-radius: 4px; }
+
+  /* Il corpo si apre solo per la divisione attiva. */
+  .passo__corpo {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.6s var(--ease-out), opacity 0.4s;
+  }
+  .passo__corpo > div { overflow: hidden; padding-left: 26px; }
+  .passo.is-attivo .passo__corpo { grid-template-rows: 1fr; opacity: 1; transition-delay: 0s, 0.15s; }
+  .passo__titolo {
+    margin: var(--space-3) 0 6px;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .passo__testo { margin: 0; max-width: 480px; font-size: var(--text-lg-size); line-height: 22px; color: var(--color-brand-300); }
+
+  /* ---------- Illustrazione ---------- */
+  .divisioni__figura {
+    background: var(--pannello);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
+  .divisioni__figura svg { width: 100%; height: 100%; max-height: 740px; display: block; }
+  .griglia { fill: var(--g700); opacity: 0.5; }
+
+  .lastra {
+    /* Piano spento: tutto in grigio. */
+    --e: var(--g800);
+    --c3: var(--g600);
+    --c4: var(--g700);
+    --c5: var(--g700);
+    --c6: var(--g800);
+    --c7: var(--g800);
+    --c8: var(--g800);
+    --cd: var(--g900);
+  }
+  .lastra.is-attiva {
+    /* Piano acceso: i colori della sua divisione (passati da --x300…--x800). */
+    --e: var(--x600);
+    --c3: var(--x300);
+    --c4: var(--x400);
+    --c5: var(--x500);
+    --c6: var(--x600);
+    --c7: var(--x700);
+    --c8: var(--x800);
+    --cd: var(--x800);
+  }
+
+  .lastra__corpo { transition: transform 0.8s var(--ease-out); }
+  .lastra.is-attiva .lastra__corpo { transform: translateY(-18px); }
+
+  .lastra * { transition: fill 0.6s, stroke 0.6s; }
+  .lato, .superficie { fill: var(--g950); stroke: var(--e); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+  .f-in { fill: var(--color-night); }
+  .f4 { fill: var(--c4); }
+  .f5 { fill: var(--c5); }
+  .f6 { fill: var(--c6); }
+  .f7 { fill: var(--c7); }
+  .f8 { fill: var(--c8); }
+  .fd { fill: var(--cd); }
+  .s4 { stroke: var(--c4); }
+  .s5 { stroke: var(--c5); }
+  .s7 { stroke: var(--c7); }
+  .anello { fill: none; stroke: var(--color-night); stroke-width: 1.5; }
+  .anello-s { fill: none; stroke-width: 1.5; }
+  .tratteggio { stroke-dasharray: 4 4; }
+  .tratto { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .etichetta {
+    fill: var(--c3);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  /* ---------- Schermi più piccoli ---------- */
+  @media (max-width: 1024px) {
+    .divisioni__testo { padding: var(--space-16) var(--space-6); gap: var(--space-10); }
+    .divisioni__titolo { font-size: 40px; }
+  }
+
+  @media (max-width: 768px) {
+    .divisioni { height: calc(100svh + (var(--passi) - 1) * 60svh); }
+    .divisioni__fermo { height: calc(100svh - var(--alto-header)); grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .divisioni__figura { order: -1; height: 38svh; }
+    .divisioni__testo { padding: var(--space-6) 16px; gap: var(--space-6); }
+    .divisioni__titolo { font-size: 32px; }
+    .passo__titolo { font-size: 22px; }
+    .passo__testo { font-size: 16px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lastra__corpo, .lastra *, .passo__corpo, .passo__punto { transition: none; }
+  }
+</style>
