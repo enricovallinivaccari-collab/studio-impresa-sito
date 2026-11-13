@@ -59,11 +59,11 @@ const lastre = divisioni.map((d, i) => {
     note: d.note.map(([u, v, testo]) => {
       const [ax, ay] = P(y, u, v);
       const destra = ax >= CX;
-      const largo = testo.length * 7.8;
+      const largo = testo.length * 8.4;
       return {
         testo: testo.toUpperCase(), ax, ay, destra,
         tx: destra ? 700 : 20,
-        lx: destra ? 700 - largo - 10 : 20 + largo + 10,
+        lx: destra ? 700 - largo - 12 : 20 + largo + 12, // punto vicino all'etichetta
       };
     }),
   };
@@ -78,11 +78,14 @@ const dalBasso = [...lastre].reverse();
       <div class="divisioni__intestazione">
         <p class="occhiello divisioni__occhiello">Le nostre divisioni</p>
         <h2 id="divisioni-titolo" class="divisioni__titolo">5 anime, un solo studio</h2>
+        <p class="divisioni__lead">Cinque divisioni che lavorano insieme, una sopra l'altra, come un'unica struttura. Scorri per conoscerle.</p>
       </div>
+
+      <div class="passi__linea" aria-hidden="true"><span class="passi__avanzamento" data-avanzamento></span></div>
 
       <ol class="passi">
         {divisioni.map((d, i) => (
-          <li class={`passo${i === 0 ? ' is-attivo' : ''}`} data-passo={i} style={`--punto:${d.scala[400]}`}>
+          <li class={`passo${i === 0 ? ' is-attivo' : ''}`} data-passo={i} style={`--punto:${d.scala[400]}`} data-colore={d.scala[400]}>
             <button class="passo__testa" type="button" data-vai={i} aria-expanded={i === 0 ? 'true' : 'false'}>
               <span class="passo__punto" aria-hidden="true"></span>
               <span class="passo__nome">{d.n}<span aria-hidden="true">&nbsp;&nbsp;</span>{d.nome}</span>
@@ -194,6 +197,7 @@ const dalBasso = [...lastre].reverse();
                   <g class="nota">
                     <line class="nota__linea" x1={n.ax} y1={n.ay} x2={n.lx} y2={n.ay} />
                     <circle class="nota__punto" cx={n.ax} cy={n.ay} r="3" />
+                    <circle class="nota__punto" cx={n.lx} cy={n.ay} r="3" />
                     <text class="nota__testo" x={n.tx} y={n.ay + 4} text-anchor={n.destra ? 'end' : 'start'}>{n.testo}</text>
                   </g>
                 ))}
@@ -218,7 +222,7 @@ const dalBasso = [...lastre].reverse();
     --alto-header: 70px;
     position: relative;
     /* Un tratto di scorrimento per ogni divisione, mentre la sezione resta ferma. */
-    height: calc(100vh + var(--passi) * 80vh);
+    height: calc(120vh + var(--passi) * 80vh);
   }
 
   .divisioni__fermo {
@@ -302,6 +306,27 @@ const dalBasso = [...lastre].reverse();
   }
   .passo__testo { margin: 0; max-width: 480px; font-size: var(--text-lg-size); line-height: 22px; color: var(--color-brand-300); }
 
+  .divisioni__lead { margin: var(--space-3) 0 0; max-width: 440px; color: var(--color-brand-300); }
+  .passi__linea { display: none; }
+
+  /* Desktop, come Griffin: le voci già viste salgono in alto, l'attiva sta al centro grande,
+     le prossime restano in basso; a sinistra una linea che si riempie col colore della divisione.
+     Le posizioni le mette animazioni.js (data-pronto). */
+  @media (min-width: 769px) {
+    .divisioni__testo[data-pronto] { position: relative; display: block; padding: 0; }
+    .divisioni__testo[data-pronto] .divisioni__intestazione { position: absolute; left: var(--space-16); right: var(--space-16); top: 50%; transform: translateY(-60%); }
+    .divisioni__testo[data-pronto] .passi { position: absolute; inset: var(--space-8) var(--space-16) var(--space-8) var(--space-16); max-width: none; display: block; }
+    .divisioni__testo[data-pronto] .passo { position: absolute; left: 0; right: 0; top: 0; margin: 0; }
+    .divisioni__testo[data-pronto] .passo__titolo { font-size: 44px; margin-top: var(--space-4, 16px); }
+    .divisioni__testo[data-pronto] .passi__linea {
+      display: block; position: absolute; left: 24px; top: var(--space-8); bottom: var(--space-8);
+      width: 1px; background: var(--g800);
+    }
+    .passi__avanzamento { position: absolute; left: 0; top: 0; width: 1px; height: 100%; background: var(--color-brand-400); transform-origin: top; transform: scaleY(0); }
+    .divisioni__testo[data-pronto] .passo__testa { margin-left: -45px; gap: 35px; }
+    .divisioni__testo[data-pronto] .passo__corpo > div { padding-left: 0; }
+  }
+
   /* ---------- Illustrazione ---------- */
   .divisioni__figura {
     background: var(--pannello);
@@ -337,6 +362,8 @@ const dalBasso = [...lastre].reverse();
     --cd: var(--x800);
   }
 
+  .lastra { transition: opacity 0.6s; }
+  .divisioni[data-in-corso] .lastra:not(.is-attiva) { opacity: 0.55; }
   .note { opacity: 0; }
   .nota__linea { stroke: var(--x600); stroke-width: 1; stroke-dasharray: 2 3; }
   .nota__punto { fill: var(--x400); }
@@ -372,11 +399,12 @@ const dalBasso = [...lastre].reverse();
   }
 
   @media (max-width: 768px) {
-    .divisioni { height: calc(100svh + var(--passi) * 80svh); }
+    .divisioni { height: calc(120svh + var(--passi) * 80svh); }
     .divisioni__fermo { height: calc(100svh - var(--alto-header)); grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
     .divisioni__figura { order: -1; height: 38svh; }
     .divisioni__testo { padding: var(--space-6) 16px; gap: var(--space-6); }
     .divisioni__titolo { font-size: 32px; }
+    .divisioni__lead { display: none; }
     .passo__titolo { font-size: 22px; }
     .passo__testo { font-size: 16px; }
   }

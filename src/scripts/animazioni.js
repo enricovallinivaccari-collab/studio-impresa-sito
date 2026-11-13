@@ -76,14 +76,21 @@ function ingrandisciImmagine() {
   img.addEventListener('mouseleave', chiudi);
 }
 
-// 4. Sezione Divisioni, come la pila di Griffin. Tutto segue lo scroll (scrub), quindi va avanti e indietro:
-//    - arrivando, i cinque piani si schiacciano uno sull'altro e l'ultimo si nasconde un po' in basso;
-//    - poi sale il primo piano (Tax), si colora ed escono le sue descrizioni;
-//    - scorrendo, il piano attivo vola su e lascia vedere il successivo, con le sue descrizioni, fino a ETS.
-//    La sezione resta ferma mentre succede tutto; a sinistra si apre il testo della divisione attiva.
+// 4. Sezione Divisioni, come la pila di griffin.com (studiata dal vivo il 13/11):
+//    - all'inizio la pila è schiacciata e l'ultimo piano si nasconde un po' in basso; a sinistra c'è l'introduzione
+//      e l'elenco delle divisioni in fondo;
+//    - scorrendo la pila si apre e la "telecamera" scende di piano in piano: il piano attivo sta al centro,
+//      si colora ed escono le sue descrizioni; quelli già visti salgono in alto, i prossimi restano sotto;
+//    - a sinistra le divisioni viste salgono in alto, l'attiva sta al centro col titolo grande, le prossime in basso,
+//      e una linea si riempie col colore della divisione.
+//    La pila segue lo scroll (scrub, va anche all'indietro); il testo a sinistra si sposta con un'animazione morbida.
 function animaDivisioni() {
   const sezione = document.querySelector('[data-divisioni]');
   if (!sezione) return;
+  const testo = sezione.querySelector('.divisioni__testo');
+  const intro = sezione.querySelector('.divisioni__intestazione');
+  const elenco = sezione.querySelector('.passi');
+  const avanzamento = sezione.querySelector('[data-avanzamento]');
   const passi = [...sezione.querySelectorAll('[data-passo]')];
   const lastre = [...sezione.querySelectorAll('[data-lastra]')].sort((a, b) => a.dataset.lastra - b.dataset.lastra);
   const corpi = lastre.map((l) => l.querySelector('.lastra__corpo'));
@@ -91,73 +98,89 @@ function animaDivisioni() {
   const yDisegno = lastre.map((l) => Number(l.dataset.y));
   const n = lastre.length;
 
-  // Posizioni (in unità del disegno, 720×740): y dell'angolo alto di ogni piano.
-  const SCHIACCIATA = 430;   // dove sta la pila schiacciata
-  const PASSO_STRETTO = 34;  // distanza tra i piani schiacciati
-  const IN_ALTO = 110;       // dove sale il piano attivo
-  const VIA = -420;          // dove vola il piano già visto
-  const schiacciata = (i, primo) => SCHIACCIATA + (i - primo) * PASSO_STRETTO;
+  // ---- Pila (unità del disegno 720×740; y = angolo alto del piano) ----
+  const SCHIACCIATA = 400;  // pila iniziale
+  const PASSO_STRETTO = 34;
+  const CENTRO = 236;       // dove sta il piano attivo
+  const APERTA = 250;       // distanza tra i piani quando la pila è aperta
+  const aperta = (i, k) => CENTRO + (i - k) * APERTA;
 
-  // Tempi della timeline in "vh di scroll": 100 per entrare nello schermo, poi 70 per divisione.
+  // Tempi in "vh di scroll": 100 per entrare, 80 per divisione, 20 di coda.
   const ENTRATA = 100;
   const PER_DIVISIONE = 80;
-  const TOTALE = ENTRATA + n * PER_DIVISIONE;
-  const inizioDivisione = (k) => ENTRATA + k * PER_DIVISIONE;
+  const TOTALE = ENTRATA + n * PER_DIVISIONE + 20;
+  const inizio = (k) => ENTRATA + k * PER_DIVISIONE;
+  const MOSSA = 45; // durata del movimento tra un piano e l'altro
 
   const tl = gsap.timeline({ paused: true, defaults: { ease: 'power2.inOut' } });
-  tl.set({}, {}, TOTALE); // la timeline dura quanto tutta la sezione
-
-  // Arrivo: dalla pila aperta del disegno alla pila schiacciata.
-  corpi.forEach((c, i) => tl.fromTo(c, { y: 0 }, { y: schiacciata(i, 0) - yDisegno[i], duration: 70 }, 0));
-
+  tl.set({}, {}, TOTALE);
+  corpi.forEach((c, i) => tl.fromTo(c, { y: 0 }, { y: SCHIACCIATA + i * PASSO_STRETTO - yDisegno[i], duration: 70 }, 0));
   for (let k = 0; k < n; k++) {
-    const t = inizioDivisione(k);
-    // Il piano attivo sale in alto...
-    tl.to(corpi[k], { y: IN_ALTO - yDisegno[k], duration: 40 }, t);
-    // ...quello prima vola via verso l'alto, e le sue descrizioni spariscono.
-    if (k > 0) {
-      tl.to(corpi[k - 1], { y: VIA - yDisegno[k - 1], opacity: 0, duration: 40, ease: 'power2.in' }, t);
-      tl.to(note[k - 1], { opacity: 0, duration: 10 }, t);
-    }
-    // Gli altri sotto risalgono di un posto nella pila schiacciata.
-    for (let j = k + 1; j < n; j++) tl.to(corpi[j], { y: schiacciata(j, k + 1) - yDisegno[j], duration: 40 }, t);
-    // Escono le descrizioni del piano attivo.
-    tl.fromTo(note[k], { opacity: 0 }, { opacity: 1, duration: 14, ease: 'none' }, t + 26);
+    const t = inizio(k);
+    corpi.forEach((c, i) => tl.to(c, { y: aperta(i, k) - yDisegno[i], duration: MOSSA }, t));
+    if (k > 0) tl.to(note[k - 1], { opacity: 0, duration: 10 }, t);
+    tl.fromTo(note[k], { opacity: 0 }, { opacity: 1, duration: 14, ease: 'none' }, t + MOSSA - 12);
   }
 
-  // Divisione attiva (colori del piano e testo a sinistra) a metà della sua salita.
+  // ---- Colonna testo ----
+  const desktop = window.matchMedia('(min-width: 769px)');
+  if (desktop.matches) testo.setAttribute('data-pronto', '');
+  const RIGA = 28; // altezza di una voce chiusa
+  const posiziona = (k, subito) => {
+    if (!desktop.matches) return;
+    const alto = elenco.clientHeight;
+    const d = subito || riduci ? 0 : 0.7;
+    passi.forEach((p, i) => {
+      let y;
+      if (k < 0) y = alto - (n - i) * RIGA;            // introduzione: tutte in fondo
+      else if (i < k) y = i * RIGA;                     // già viste: in alto
+      else if (i === k) y = alto * 0.36;                // attiva: al centro
+      else y = alto - (n - i) * RIGA;                   // prossime: in fondo
+      gsap.to(p, { y, duration: d, ease: 'power3.inOut', overwrite: 'auto' });
+    });
+    gsap.to(intro, { autoAlpha: k < 0 ? 1 : 0, yPercent: k < 0 ? -60 : -90, duration: d, ease: 'power2.out', overwrite: 'auto' });
+    if (avanzamento) {
+      gsap.to(avanzamento, {
+        scaleY: k < 0 ? 0 : (k * RIGA + alto * 0.36 + 10) / alto,
+        backgroundColor: k < 0 ? '#4f8fcc' : passi[k].dataset.colore,
+        duration: d, ease: 'power3.inOut', overwrite: 'auto',
+      });
+    }
+  };
+
   let attivo = null;
   const attiva = (i) => {
     if (i === attivo) return;
     attivo = i;
     passi.forEach((p, k) => {
-      const si = k === Math.max(i, 0);
+      const si = desktop.matches ? k === i : k === Math.max(i, 0);
       p.classList.toggle('is-attivo', si);
       p.querySelector('[data-vai]')?.setAttribute('aria-expanded', String(si));
     });
     lastre.forEach((l, k) => l.classList.toggle('is-attiva', k === i));
+    sezione.toggleAttribute('data-in-corso', i >= 0);
+    posiziona(i);
   };
-  const indiceDa = (tempo) => Math.min(n - 1, Math.floor((tempo - ENTRATA - 20) / PER_DIVISIONE));
+  const indiceDa = (tempo) => (tempo < ENTRATA + MOSSA / 2 ? -1 : Math.min(n - 1, Math.floor((tempo - ENTRATA - MOSSA / 2) / PER_DIVISIONE)));
 
   ScrollTrigger.create({
     trigger: sezione,
     start: 'top bottom',
     end: 'bottom bottom',
-    scrub: riduci ? true : 0.8, // un po' di ritardo rende il movimento più morbido
+    scrub: riduci ? true : 0.8,
     animation: tl,
   });
-  // Si legge il tempo della timeline (non dello scroll), così i colori seguono il movimento morbido.
-  tl.eventCallback('onUpdate', () => {
-    const tempo = tl.time();
-    attiva(tempo < ENTRATA + 20 ? -1 : indiceDa(tempo));
-  });
+  tl.eventCallback('onUpdate', () => attiva(indiceDa(tl.time())));
+  attiva(-1);
+  posiziona(-1, true);
+  window.addEventListener('resize', () => posiziona(attivo, true));
 
-  // Clic su una divisione: scorre fino al momento in cui è in alto con le descrizioni.
+  // Clic su una divisione: scorre fino al momento in cui è al centro con le descrizioni.
   passi.forEach((p, i) => {
     p.querySelector('[data-vai]')?.addEventListener('click', () => {
-      const inizio = sezione.getBoundingClientRect().top + window.scrollY - window.innerHeight;
-      const tempo = inizioDivisione(i) + 60;
-      window.scrollTo({ top: inizio + (tempo / TOTALE) * sezione.offsetHeight, behavior: riduci ? 'auto' : 'smooth' });
+      const partenza = sezione.getBoundingClientRect().top + window.scrollY - window.innerHeight;
+      const tempo = inizio(i) + MOSSA + 15;
+      window.scrollTo({ top: partenza + (tempo / TOTALE) * sezione.offsetHeight, behavior: riduci ? 'auto' : 'smooth' });
     });
   });
 }
