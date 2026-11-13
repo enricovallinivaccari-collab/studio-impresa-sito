@@ -77,10 +77,10 @@ function ingrandisciImmagine() {
 }
 
 // 4. Sezione Divisioni, come la pila di griffin.com (studiata dal vivo il 13/11):
-//    - all'inizio la pila è schiacciata e l'ultimo piano si nasconde un po' in basso; a sinistra c'è l'introduzione
+//    - all'inizio la pila è compatta, centrata e tutta colorata; a sinistra c'è l'introduzione
 //      e l'elenco delle divisioni in fondo;
-//    - scorrendo la pila si apre e la "telecamera" scende di piano in piano: il piano attivo sta al centro,
-//      si colora ed escono le sue descrizioni; quelli già visti salgono in alto, i prossimi restano sotto;
+//    - scorrendo la pila si apre (i piani sotto scendono e diventano neutri) e la "telecamera" scende di piano
+//      in piano: il piano attivo sta al centro, colorato, ed escono le sue descrizioni; quelli già visti salgono in alto, i prossimi restano sotto;
 //    - a sinistra le divisioni viste salgono in alto, l'attiva sta al centro col titolo grande, le prossime in basso,
 //      e una linea si riempie col colore della divisione.
 //    La pila segue lo scroll (scrub, va anche all'indietro); il testo a sinistra si sposta con un'animazione morbida.
@@ -99,8 +99,8 @@ function animaDivisioni() {
   const n = lastre.length;
 
   // ---- Pila (unità del disegno 720×740; y = angolo alto del piano) ----
-  const SCHIACCIATA = 400;  // pila iniziale
-  const PASSO_STRETTO = 34;
+  const SCHIACCIATA = 106;  // pila iniziale: centrata nel pannello, tutta colorata
+  const PASSO_STRETTO = 74;
   const CENTRO = 236;       // dove sta il piano attivo
   const APERTA = 250;       // distanza tra i piani quando la pila è aperta
   const aperta = (i, k) => CENTRO + (i - k) * APERTA;
@@ -159,7 +159,8 @@ function animaDivisioni() {
       p.classList.toggle('is-attivo', si);
       p.querySelector('[data-vai]')?.setAttribute('aria-expanded', String(si));
     });
-    lastre.forEach((l, k) => l.classList.toggle('is-attiva', k === i));
+    // Nell'introduzione tutti i piani hanno i loro colori; poi solo quello attivo, gli altri neutri.
+    lastre.forEach((l, k) => l.classList.toggle('is-attiva', i < 0 || k === i));
     sezione.toggleAttribute('data-in-corso', i >= 0);
     posiziona(i);
   };
