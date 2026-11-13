@@ -122,8 +122,8 @@ const voci = [
     z-index: 20;
   }
 
-  /* "Header collapse": pillola 52 px, padding 8/10, fondo Night 50% + sfocatura 10 px.
-     In cima alla pagina sta sopra la barra Night, quindi non si vede (come su Griffin). */
+  /* "Header collapse": pillola 52 px, padding 8/10. Come griffin.com: nessun colore di fondo,
+     solo sfocatura di 12 px di quello che passa sotto. */
   .menu__lista {
     position: relative;
     isolation: isolate;
@@ -134,9 +134,9 @@ const voci = [
     padding: var(--space-2) var(--space-2-5);
     list-style: none;
     border-radius: var(--radius-full);
-    background: rgba(4, 15, 21, 0.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: transparent;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .menu__pillola {
