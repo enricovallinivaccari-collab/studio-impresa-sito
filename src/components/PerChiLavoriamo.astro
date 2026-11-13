@@ -1,0 +1,366 @@
+---
+import Pulsante from './Pulsante.astro';
+
+// Sezione Figma "C · Galleria dei percorsi" (frame 116:193, Page 1), scelta da Enrico il 13/11.
+// Una card con foto per ogni profilo: scorrendo la pagina la sezione resta ferma e le card
+// avanzano di lato; quella attiva si allarga e mostra testo, punti e pulsante.
+// Si può anche cliccare una card o usare le frecce. I testi sono provvisori (copywriter).
+// Foto da Unsplash (licenza Unsplash), caricate dal loro CDN.
+
+const foto = (id: string, w: number) => `https://images.unsplash.com/${id}?w=${w}&q=75&auto=format&fit=crop`;
+
+const profili = [
+  {
+    titolo: 'Ho una cantina',
+    testo: 'Controllo di gestione, rimanenze, bilanci e reti d’impresa: conosciamo i numeri del vino e chi li fa.',
+    punti: ['Osservatorio bilanci', 'Convegni sul vino', 'Un referente'],
+    foto: 'photo-1561906814-23da9a8bfee0', alt: 'Botti di vino in fila in una cantina a volta',
+  },
+  {
+    titolo: 'Sto aprendo un’impresa',
+    testo: 'Forma giuridica, business plan, bandi e primi adempimenti: partiamo bene, insieme, fin dal primo giorno.',
+    punti: ['Forma giuridica', 'Bandi e contributi', 'Primo bilancio'],
+    foto: 'photo-1543269664-02e941c052f7', alt: 'Giovane imprenditrice sorridente al computer',
+  },
+  {
+    titolo: 'Piccole e medie imprese',
+    testo: 'Contabilità, paghe, contratti e controllo di gestione in un solo studio, con un referente che ti conosce.',
+    punti: ['Un solo interlocutore', 'Numeri ogni mese', 'Piani di crescita'],
+    foto: 'photo-1661446600373-125cfeadf275', alt: 'Artigiano al lavoro nella sua bottega',
+  },
+  {
+    titolo: 'Farmacie',
+    testo: 'Fisco e personale della farmacia, passaggi di titolarità e società tra farmacisti, seguiti da chi conosce il settore.',
+    punti: ['Passaggi di titolarità', 'Paghe del personale', 'Società tra farmacisti'],
+    foto: 'photo-1580281657527-47f249e8f4df', alt: 'Farmacista che prende un prodotto dallo scaffale',
+  },
+  {
+    titolo: 'Imprese in difficoltà',
+    testo: 'Crisi d’impresa, ristrutturazione del debito e composizione negoziata: muoversi presto fa la differenza.',
+    punti: ['Allerta precoce', 'Piano di risanamento', 'Rapporti con le banche'],
+    foto: 'photo-1518644730709-0835105d9daa', alt: 'Imprenditore pensieroso davanti al portatile',
+  },
+  {
+    titolo: 'Lavoro con l’estero',
+    testo: 'Contratti internazionali, IVA comunitaria, dogane e personale all’estero, per vendere oltre confine senza sorprese.',
+    punti: ['IVA e dogane', 'Contratti esteri', 'Trasferte e distacchi'],
+    foto: 'photo-1769837496184-32831581c55a', alt: 'Porto commerciale con navi e container visto dall’alto',
+  },
+];
+const tot = String(profili.length).padStart(2, '0');
+---
+
+<section class="percorsi" data-percorsi aria-labelledby="percorsi-titolo" style={`--passi:${profili.length}`}>
+  <div class="percorsi__fermo">
+    <div class="percorsi__intestazione">
+      <div>
+        <p class="occhiello percorsi__occhiello">Per chi lavoriamo</p>
+        <h2 id="percorsi-titolo" class="percorsi__titolo">Un percorso<br />per ogni impresa</h2>
+      </div>
+      <div class="percorsi__nav">
+        <p class="percorsi__conta" aria-live="polite"><span data-conta>01</span> / {tot}</p>
+        <button class="freccia" type="button" data-indietro aria-label="Profilo precedente">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </button>
+        <button class="freccia freccia--piena" type="button" data-avanti aria-label="Profilo successivo">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M8 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="percorsi__finestra">
+      <ol class="percorsi__binario" data-binario-percorsi>
+        {profili.map((p, i) => (
+          <li class:list={['card', { 'is-attiva': i === 0 }]} data-card>
+            <img
+              class="card__foto"
+              src={foto(p.foto, 1000)}
+              srcset={`${foto(p.foto, 500)} 500w, ${foto(p.foto, 1000)} 1000w, ${foto(p.foto, 1500)} 1500w`}
+              sizes="(max-width: 768px) 85vw, 680px"
+              alt={p.alt}
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="card__numero">{String(i + 1).padStart(2, '0')}</span>
+            <button class="card__apri" type="button" data-apri={i} aria-label={`Apri: ${p.titolo}`}>
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="currentColor" fill-opacity="0.16" /><path d="M20 13v14M13 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+            </button>
+            <h3 class="card__titolo-chiuso" aria-hidden="true">{p.titolo}</h3>
+            <div class="card__contenuto">
+              <h3 class="card__titolo">{p.titolo}</h3>
+              <p class="card__testo">{p.testo}</p>
+              <ul class="card__punti">
+                {p.punti.map((t) => (
+                  <li>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8.25" stroke="currentColor" stroke-width="1.5" /><path d="M6.5 10.2l2.3 2.3 4.7-4.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+              <div class="card__azione"><Pulsante href="#">Scopri il percorso</Pulsante></div>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <div class="percorsi__barra" aria-hidden="true"><span data-barra></span></div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Sezione "Per chi lavoriamo": la sezione resta ferma e lo scroll fa avanzare le card di lato,
+  // una per tratto. Su mobile e con "riduci animazioni" niente blocco: si scorre col dito o con le frecce.
+  function animaPercorsi() {
+    const sezione = document.querySelector<HTMLElement>('[data-percorsi]');
+    if (!sezione) return;
+    const binario = sezione.querySelector<HTMLElement>('[data-binario-percorsi]')!;
+    const card = [...sezione.querySelectorAll<HTMLElement>('[data-card]')];
+    const conta = sezione.querySelector<HTMLElement>('[data-conta]')!;
+    const barra = sezione.querySelector<HTMLElement>('[data-barra]')!;
+    const n = card.length;
+    const riduci = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const desktop = window.matchMedia('(min-width: 769px)');
+    let attiva = -1;
+    let trigger: ScrollTrigger | null = null;
+
+    // Misure fisse prese dal CSS (le card cambiano larghezza con una transizione, quindi non si misurano).
+    const misure = () => {
+      const cs = getComputedStyle(binario);
+      const fin = binario.parentElement!;
+      return {
+        chiusa: parseFloat(cs.getPropertyValue('--chiusa')) || 320,
+        aperta: parseFloat(cs.getPropertyValue('--aperta')) || 680,
+        gap: parseFloat(cs.columnGap) || 16,
+        visibile: fin.clientWidth - parseFloat(getComputedStyle(fin).paddingLeft) * 2,
+      };
+    };
+
+    // Quanto far scorrere il binario per portare la card i al bordo sinistro, senza mai lasciare
+    // spazio vuoto a destra dopo l'ultima card.
+    const spostamento = (i: number) => {
+      const m = misure();
+      const totale = m.chiusa * (n - 1) + m.aperta + m.gap * (n - 1);
+      return Math.min(i * (m.chiusa + m.gap), Math.max(0, totale - m.visibile));
+    };
+
+    const mostra = (i: number) => {
+      i = Math.max(0, Math.min(n - 1, i));
+      if (i === attiva) return;
+      attiva = i;
+      card.forEach((c, k) => {
+        c.classList.toggle('is-attiva', k === i);
+        c.querySelector('.card__contenuto')?.toggleAttribute('inert', k !== i && desktop.matches);
+      });
+      conta.textContent = String(i + 1).padStart(2, '0');
+      barra.style.width = `${((i + 1) / n) * 100}%`;
+      if (desktop.matches) {
+        binario.style.transform = `translateX(${-spostamento(i)}px)`;
+      } else {
+        const c = card[i];
+        binario.parentElement!.scrollTo({ left: c.offsetLeft - binario.offsetLeft, behavior: riduci ? 'auto' : 'smooth' });
+      }
+    };
+
+    // Vai a una card: su desktop si scorre la pagina fino al suo tratto, così scroll e card restano allineati.
+    const vai = (i: number) => {
+      i = Math.max(0, Math.min(n - 1, i));
+      if (trigger) {
+        const y = trigger.start + ((i + 0.5) / n) * (trigger.end - trigger.start);
+        window.scrollTo({ top: y, behavior: riduci ? 'auto' : 'smooth' });
+      } else {
+        mostra(i);
+      }
+    };
+
+    const imposta = () => {
+      trigger?.kill();
+      trigger = null;
+      binario.style.transform = '';
+      const fermo = desktop.matches && !riduci;
+      sezione.classList.toggle('is-ferma', fermo);
+      if (fermo) {
+        trigger = ScrollTrigger.create({
+          trigger: sezione,
+          start: 'top top',
+          end: 'bottom bottom',
+          onUpdate: (st) => mostra(Math.min(n - 1, Math.floor(st.progress * n))),
+        });
+      }
+      const i = attiva < 0 ? 0 : attiva;
+      attiva = -1;
+      mostra(i);
+    };
+
+    sezione.querySelector('[data-avanti]')!.addEventListener('click', () => vai(attiva + 1));
+    sezione.querySelector('[data-indietro]')!.addEventListener('click', () => vai(attiva - 1));
+    card.forEach((c, i) => {
+      c.querySelector('[data-apri]')!.addEventListener('click', () => vai(i));
+    });
+
+    // Su mobile la card attiva è quella più vicina al bordo sinistro mentre si scorre col dito.
+    const finestra = binario.parentElement!;
+    let attesa = 0;
+    finestra.addEventListener('scroll', () => {
+      if (desktop.matches) return;
+      clearTimeout(attesa);
+      attesa = window.setTimeout(() => {
+        const x = finestra.scrollLeft;
+        let migliore = 0;
+        card.forEach((c, k) => { if (Math.abs(c.offsetLeft - binario.offsetLeft - x) < Math.abs(card[migliore].offsetLeft - binario.offsetLeft - x)) migliore = k; });
+        if (migliore !== attiva) { attiva = migliore; card.forEach((c, k) => c.classList.toggle('is-attiva', k === migliore)); conta.textContent = String(migliore + 1).padStart(2, '0'); barra.style.width = `${((migliore + 1) / n) * 100}%`; }
+      }, 120);
+    }, { passive: true });
+
+    desktop.addEventListener('change', imposta);
+    window.addEventListener('resize', () => { if (desktop.matches) binario.style.transform = `translateX(${-spostamento(attiva)}px)`; });
+    imposta();
+  }
+
+  animaPercorsi();
+</script>
+
+<style>
+  .percorsi { position: relative; }
+  .percorsi.is-ferma { height: calc(100vh + (var(--passi) - 1) * 70vh); }
+  .percorsi__fermo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-16);
+    padding: var(--space-24) var(--space-16);
+    overflow: hidden;
+  }
+  .percorsi.is-ferma .percorsi__fermo { position: sticky; top: 0; height: 100vh; padding-block: 104px var(--space-10); gap: var(--space-10); }
+
+  /* ---------- Intestazione ---------- */
+  .percorsi__intestazione { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--space-8); }
+  .percorsi__occhiello { font-size: var(--text-xs-size); line-height: var(--text-xs-lh); letter-spacing: 0.06em; color: var(--color-brand-300); margin-bottom: var(--space-3); }
+  .percorsi__titolo { margin: 0; font-family: var(--font-heading); font-weight: 400; font-size: 60px; line-height: 72px; letter-spacing: -0.02em; }
+  .percorsi__nav { display: flex; align-items: center; gap: var(--space-3); }
+  .percorsi__conta { margin: 0 var(--space-3) 0 0; font-family: var(--font-mono); font-size: var(--text-sm-size); line-height: var(--text-sm-lh); color: var(--color-brand-300); font-variant-numeric: tabular-nums; }
+  .freccia {
+    display: grid; place-items: center;
+    width: 52px; height: 52px;
+    border-radius: var(--radius-full);
+    border: 1px solid #1e3a52;
+    background: transparent;
+    color: var(--color-on-dark);
+    cursor: pointer;
+    transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+  }
+  .freccia:hover { border-color: var(--color-on-dark); }
+  .freccia--piena { background: var(--color-on-dark); border-color: var(--color-on-dark); color: #002337; }
+  .freccia--piena:hover { background: var(--color-brand-300); border-color: var(--color-brand-300); }
+  .freccia:focus-visible, .card__apri:focus-visible { outline: 2px solid var(--color-brand-300); outline-offset: 3px; }
+
+  /* ---------- Card ---------- */
+  .percorsi__finestra { margin-inline: calc(var(--space-16) * -1); padding-inline: var(--space-16); }
+  .percorsi__binario {
+    --alta: clamp(400px, calc(100vh - 420px), 600px);
+    --aperta: 680px;
+    --chiusa: 320px;
+    list-style: none; margin: 0; padding: 0;
+    display: flex; gap: 16px;
+    transition: transform 0.9s var(--ease-out);
+    will-change: transform;
+  }
+  .card {
+    position: relative;
+    flex: 0 0 var(--chiusa);
+    height: var(--alta);
+    border-radius: 24px;
+    overflow: hidden;
+    isolation: isolate;
+    background: #0b1e2b;
+    transition: flex-basis 0.9s var(--ease-out);
+  }
+  .card.is-attiva { flex-basis: var(--aperta); }
+  .card__foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform 1.2s var(--ease-out); }
+  .card:not(.is-attiva):hover .card__foto { transform: scale(1.04); }
+  .card::after {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(4, 15, 21, 0) 45%, rgba(4, 15, 21, 0.85) 100%);
+    transition: opacity 0.9s var(--ease-out);
+  }
+  .card.is-attiva::after { background: linear-gradient(180deg, rgba(4, 15, 21, 0) 20%, rgba(4, 15, 21, 0.95) 100%); }
+
+  .card__numero { position: absolute; top: 28px; left: 28px; font-family: var(--font-mono); font-size: var(--text-sm-size); line-height: var(--text-sm-lh); }
+  .card.is-attiva .card__numero { left: 36px; }
+  .card__apri {
+    position: absolute; inset: 0;
+    display: flex; justify-content: flex-end; align-items: flex-start;
+    padding: 24px 28px;
+    border: 0; background: none; color: var(--color-on-dark); cursor: pointer;
+    transition: opacity 0.4s var(--ease-out);
+  }
+  .card__apri svg { transition: transform 0.4s var(--ease-out); }
+  .card__apri:hover svg { transform: rotate(90deg); }
+  .card.is-attiva .card__apri { opacity: 0; pointer-events: none; }
+
+  .card__titolo-chiuso {
+    position: absolute; left: 28px; right: 28px; bottom: 28px; margin: 0;
+    font-family: var(--font-heading); font-weight: 400; font-size: 30px; line-height: 38px; letter-spacing: -0.01em;
+    pointer-events: none;
+    transition: opacity 0.4s var(--ease-out), transform 0.6s var(--ease-out);
+  }
+  .card.is-attiva .card__titolo-chiuso { opacity: 0; transform: translateY(12px); }
+
+  .card__contenuto {
+    position: absolute; left: 36px; bottom: 36px; width: 560px;
+    display: flex; flex-direction: column; gap: 20px;
+    opacity: 0; transform: translateY(24px); pointer-events: none;
+    transition: opacity 0.35s var(--ease-out), transform 0.35s var(--ease-out);
+  }
+  .card.is-attiva .card__contenuto { opacity: 1; transform: none; pointer-events: auto; transition: opacity 0.7s 0.35s var(--ease-out), transform 0.9s 0.35s var(--ease-out); }
+  .card__titolo { margin: 0; font-family: var(--font-heading); font-weight: 400; font-size: 48px; line-height: 60px; letter-spacing: -0.02em; }
+  .card__testo { margin: 0; max-width: 480px; color: var(--color-brand-300); }
+  .card__punti { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2) 20px; font-size: 16px; line-height: 24px; }
+  .card__punti li { display: flex; align-items: center; gap: var(--space-2); }
+  .card__punti svg { color: var(--color-brand-400); flex: none; }
+  .card__azione { padding-top: var(--space-2); }
+
+  /* ---------- Barra di avanzamento ---------- */
+  .percorsi__barra { position: relative; height: 2px; background: rgba(255, 255, 255, 0.15); }
+  .percorsi__barra span { position: absolute; inset: 0 auto 0 0; width: calc(100% / 6); background: var(--color-on-dark); transition: width 0.9s var(--ease-out); }
+
+  /* ---------- Schermi più piccoli ---------- */
+  @media (max-width: 1024px) {
+    .percorsi__fermo { padding-inline: var(--space-6); }
+    .percorsi__finestra { margin-inline: calc(var(--space-6) * -1); padding-inline: var(--space-6); }
+    .percorsi__titolo { font-size: 48px; line-height: 56px; }
+    .percorsi__binario { --aperta: 600px; }
+    .card__contenuto { width: calc(100% - 72px); }
+  }
+
+  @media (max-width: 768px) {
+    .percorsi__fermo { padding: var(--space-16) 16px; gap: var(--space-8); }
+    .percorsi__titolo { font-size: 36px; line-height: 44px; }
+    .percorsi__intestazione { align-items: flex-end; }
+    .percorsi__conta { display: none; }
+    .freccia { width: 44px; height: 44px; }
+    .percorsi__finestra {
+      margin-inline: -16px; padding-inline: 16px;
+      overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 16px;
+      scrollbar-width: none;
+    }
+    .percorsi__finestra::-webkit-scrollbar { display: none; }
+    .percorsi__binario { --alta: 520px; transition: none; }
+    .card, .card.is-attiva { flex-basis: 85vw; scroll-snap-align: start; }
+    .card::after, .card.is-attiva::after { background: linear-gradient(180deg, rgba(4, 15, 21, 0) 15%, rgba(4, 15, 21, 0.95) 100%); }
+    .card__apri, .card__titolo-chiuso { display: none; }
+    .card__numero, .card.is-attiva .card__numero { left: 24px; top: 24px; }
+    .card__contenuto, .card.is-attiva .card__contenuto { left: 24px; right: 24px; bottom: 24px; width: auto; opacity: 1; transform: none; pointer-events: auto; transition: none; gap: 14px; }
+    .card__titolo { font-size: 30px; line-height: 38px; }
+    .card__testo { font-size: 16px; line-height: 24px; }
+    .card__punti { flex-direction: column; font-size: 14px; line-height: 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .percorsi__binario, .card, .card *, .card::after, .percorsi__barra span { transition: none !important; }
+  }
+</style>
