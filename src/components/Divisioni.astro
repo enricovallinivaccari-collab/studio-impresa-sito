@@ -222,7 +222,7 @@ const dalBasso = [...lastre].reverse();
     --alto-header: 70px;
     position: relative;
     /* Un tratto di scorrimento per ogni divisione, mentre la sezione resta ferma. */
-    height: calc(120vh + var(--passi) * 80vh);
+    height: calc(190vh + var(--passi) * 80vh); /* = TOTALE in animazioni.js */
   }
 
   .divisioni__fermo {
@@ -399,7 +399,7 @@ const dalBasso = [...lastre].reverse();
   }
 
   @media (max-width: 768px) {
-    .divisioni { height: calc(120svh + var(--passi) * 80svh); }
+    .divisioni { height: calc(190svh + var(--passi) * 80svh); }
     .divisioni__fermo { height: calc(100svh - var(--alto-header)); grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
     .divisioni__figura { order: -1; height: 38svh; }
     .divisioni__testo { padding: var(--space-6) 16px; gap: var(--space-6); }

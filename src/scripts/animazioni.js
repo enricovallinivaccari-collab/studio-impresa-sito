@@ -105,16 +105,18 @@ function animaDivisioni() {
   const APERTA = 250;       // distanza tra i piani quando la pila è aperta
   const aperta = (i, k) => CENTRO + (i - k) * APERTA;
 
-  // Tempi in "vh di scroll": 100 per entrare, 80 per divisione, 20 di coda.
+  // Tempi in "vh di scroll": 100 per entrare, 70 di introduzione ferma (descrizione + pila schiacciata),
+  // 80 per divisione, 20 di coda. Deve tornare con l'altezza della sezione in Divisioni.astro.
   const ENTRATA = 100;
+  const INTRO = 70;
   const PER_DIVISIONE = 80;
-  const TOTALE = ENTRATA + n * PER_DIVISIONE + 20;
-  const inizio = (k) => ENTRATA + k * PER_DIVISIONE;
+  const TOTALE = ENTRATA + INTRO + n * PER_DIVISIONE + 20;
+  const inizio = (k) => ENTRATA + INTRO + k * PER_DIVISIONE;
   const MOSSA = 45; // durata del movimento tra un piano e l'altro
 
   const tl = gsap.timeline({ paused: true, defaults: { ease: 'power2.inOut' } });
   tl.set({}, {}, TOTALE);
-  corpi.forEach((c, i) => tl.fromTo(c, { y: 0 }, { y: SCHIACCIATA + i * PASSO_STRETTO - yDisegno[i], duration: 70 }, 0));
+  corpi.forEach((c, i) => tl.fromTo(c, { y: 0 }, { y: SCHIACCIATA + i * PASSO_STRETTO - yDisegno[i], duration: 90 }, 0));
   for (let k = 0; k < n; k++) {
     const t = inizio(k);
     corpi.forEach((c, i) => tl.to(c, { y: aperta(i, k) - yDisegno[i], duration: MOSSA }, t));
@@ -161,7 +163,7 @@ function animaDivisioni() {
     sezione.toggleAttribute('data-in-corso', i >= 0);
     posiziona(i);
   };
-  const indiceDa = (tempo) => (tempo < ENTRATA + MOSSA / 2 ? -1 : Math.min(n - 1, Math.floor((tempo - ENTRATA - MOSSA / 2) / PER_DIVISIONE)));
+  const indiceDa = (tempo) => (tempo < inizio(0) + MOSSA / 2 ? -1 : Math.min(n - 1, Math.floor((tempo - inizio(0) - MOSSA / 2) / PER_DIVISIONE)));
 
   ScrollTrigger.create({
     trigger: sezione,
