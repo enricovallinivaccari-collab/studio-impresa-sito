@@ -6,31 +6,31 @@
 
 const divisioni = [
   {
-    chiave: 'tax', n: '01', nome: 'Tax',
+    chiave: 'tax', note: [[110, 58, 'Dichiarazioni'], [178, 147, 'Bilanci e revisione'], [40, 160, 'Finanza agevolata']] as [number, number, string][], n: '01', nome: 'Tax',
     titolo: 'Fisco e bilancio, senza sorprese',
     testo: 'Dichiarazioni, bilanci, revisione e finanza agevolata. Ti diciamo prima cosa succede, non dopo.',
     scala: { 300: '#9CC7F3', 400: '#73ABE2', 500: '#4F8FCC', 600: '#3474B0', 700: '#225E93', 800: '#174B78' },
   },
   {
-    chiave: 'legal', n: '02', nome: 'Legal',
+    chiave: 'legal', note: [[156, 40, 'Contratti'], [173, 115, 'Diritto societario'], [58, 160, 'Contenzioso']] as [number, number, string][], n: '02', nome: 'Legal',
     titolo: 'Contratti e società, scritti bene',
     testo: 'Contratti, diritto societario, recupero crediti e contenzioso. Per firmare tranquilli.',
     scala: { 300: '#89D3CD', 400: '#53BAB3', 500: '#06A099', 600: '#09827D', 700: '#076965', 800: '#005450' },
   },
   {
-    chiave: 'job', n: '03', nome: 'Job',
+    chiave: 'job', note: [[126, 26, 'Persone'], [190, 96, 'Welfare'], [76, 150, 'Buste paga']] as [number, number, string][], n: '03', nome: 'Job',
     titolo: 'Persone e paghe in ordine',
     testo: 'Buste paga, contratti di lavoro, welfare e relazioni sindacali. Ogni mese, puntuali.',
     scala: { 300: '#FFBA70', 400: '#F4991A', 500: '#D18001', 600: '#AB6906', 700: '#8B5401', 800: '#704302' },
   },
   {
-    chiave: 'advisory', n: '04', nome: 'Advisory',
+    chiave: 'advisory', note: [[172, 52, 'Obiettivi'], [190, 124, 'Crescita'], [90, 165, 'Controllo di gestione']] as [number, number, string][], n: '04', nome: 'Advisory',
     titolo: 'Strategia per crescere',
     testo: 'Controllo di gestione, operazioni straordinarie e passaggi generazionali. Numeri chiari per le scelte importanti.',
     scala: { 300: '#CBDC6B', 400: '#B4C709', 500: '#99A901', 600: '#7C8A01', 700: '#647002', 800: '#505900' },
   },
   {
-    chiave: 'ets', n: '05', nome: 'ETS',
+    chiave: 'ets', note: [[162, 50, '5 per mille'], [190, 150, 'Raccolta fondi'], [70, 150, 'Statuti e RUNTS']] as [number, number, string][], n: '05', nome: 'ETS',
     titolo: 'Al fianco del terzo settore',
     testo: 'Statuti e iscrizione al RUNTS, bilanci, 5 per mille e raccolta fondi per associazioni e fondazioni.',
     scala: { 300: '#97DBB6', 400: '#6AC697', 500: '#3CAD79', 600: '#0F905E', 700: '#06754B', 800: '#045E3B' },
@@ -54,6 +54,18 @@ const lastre = divisioni.map((d, i) => {
     sinistro: punti([L, B, [B[0], B[1] + T], [L[0], L[1] + T]]),
     destro: punti([B, R, [R[0], R[1] + T], [B[0], B[1] + T]]),
     colori: Object.entries(d.scala).map(([k, v]) => `--x${k}:${v}`).join(';'),
+    y,
+    // Descrizioni che escono accanto al piano attivo: un punto sul piano, una linea e l'etichetta al bordo.
+    note: d.note.map(([u, v, testo]) => {
+      const [ax, ay] = P(y, u, v);
+      const destra = ax >= CX;
+      const largo = testo.length * 7.8;
+      return {
+        testo: testo.toUpperCase(), ax, ay, destra,
+        tx: destra ? 700 : 20,
+        lx: destra ? 700 - largo - 10 : 20 + largo + 10,
+      };
+    }),
   };
 });
 // Si disegnano dal basso: il piano sopra copre quello sotto.
@@ -96,7 +108,7 @@ const dalBasso = [...lastre].reverse();
         <rect width="720" height="740" fill="url(#griglia-punti)" />
 
         {dalBasso.map((l) => (
-          <g class={`lastra${l.i === 0 ? ' is-attiva' : ''}`} data-lastra={l.i} style={l.colori}>
+          <g class="lastra" data-lastra={l.i} data-y={l.y} style={l.colori}>
             <g class="lastra__corpo">
               <polygon class="lato" points={l.sinistro} />
               <polygon class="lato" points={l.destro} />
@@ -177,6 +189,15 @@ const dalBasso = [...lastre].reverse();
 
                 <text class="etichetta" x="16" y="211">{l.n} {l.nome.toUpperCase()}</text>
               </g>
+              <g class="note" data-note={l.i}>
+                {l.note.map((n) => (
+                  <g class="nota">
+                    <line class="nota__linea" x1={n.ax} y1={n.ay} x2={n.lx} y2={n.ay} />
+                    <circle class="nota__punto" cx={n.ax} cy={n.ay} r="3" />
+                    <text class="nota__testo" x={n.tx} y={n.ay + 4} text-anchor={n.destra ? 'end' : 'start'}>{n.testo}</text>
+                  </g>
+                ))}
+              </g>
             </g>
           </g>
         ))}
@@ -197,7 +218,7 @@ const dalBasso = [...lastre].reverse();
     --alto-header: 70px;
     position: relative;
     /* Un tratto di scorrimento per ogni divisione, mentre la sezione resta ferma. */
-    height: calc(100vh + (var(--passi) - 1) * 70vh);
+    height: calc(100vh + var(--passi) * 80vh);
   }
 
   .divisioni__fermo {
@@ -289,7 +310,8 @@ const dalBasso = [...lastre].reverse();
     justify-content: center;
     min-width: 0;
   }
-  .divisioni__figura svg { width: 100%; height: 100%; max-height: 740px; display: block; }
+  .divisioni__figura { overflow: hidden; }
+  .divisioni__figura svg { width: 100%; height: 100%; max-height: 740px; display: block; overflow: visible; }
   .griglia { fill: var(--g700); opacity: 0.5; }
 
   .lastra {
@@ -315,8 +337,10 @@ const dalBasso = [...lastre].reverse();
     --cd: var(--x800);
   }
 
-  .lastra__corpo { transition: transform 0.8s var(--ease-out); }
-  .lastra.is-attiva .lastra__corpo { transform: translateY(-18px); }
+  .note { opacity: 0; }
+  .nota__linea { stroke: var(--x600); stroke-width: 1; stroke-dasharray: 2 3; }
+  .nota__punto { fill: var(--x400); }
+  .nota__testo { fill: var(--x300); font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.04em; }
 
   .lastra * { transition: fill 0.6s, stroke 0.6s; }
   .lato, .superficie { fill: var(--g950); stroke: var(--e); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
@@ -348,7 +372,7 @@ const dalBasso = [...lastre].reverse();
   }
 
   @media (max-width: 768px) {
-    .divisioni { height: calc(100svh + (var(--passi) - 1) * 60svh); }
+    .divisioni { height: calc(100svh + var(--passi) * 80svh); }
     .divisioni__fermo { height: calc(100svh - var(--alto-header)); grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
     .divisioni__figura { order: -1; height: 38svh; }
     .divisioni__testo { padding: var(--space-6) 16px; gap: var(--space-6); }
@@ -358,6 +382,6 @@ const dalBasso = [...lastre].reverse();
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .lastra__corpo, .lastra *, .passo__corpo, .passo__punto { transition: none; }
+    .lastra *, .passo__corpo, .passo__punto { transition: none; }
   }
 </style>
