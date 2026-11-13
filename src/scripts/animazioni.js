@@ -102,7 +102,7 @@ function animaDivisioni() {
   // Movimento misurato su griffin.com: i piani si muovono a velocità COSTANTE con lo scroll (niente pause,
   // niente accelerazioni, nessun ritardo). Ogni piano aspetta compatto in basso scendendo piano piano,
   // poi in due tratti sale veloce: arriva al centro e prosegue verso l'alto, dove si riaccoda compatto.
-  const INTRO_Y = 106;      // introduzione: pila centrata, aperta, tutta colorata
+  const INTRO_Y = 106;      // introduzione: pila centrata e aperta
   const INTRO_PASSO = 74;
   const CENTRO = 236;       // il piano attivo passa da qui a metà del suo tratto
   const APERTA = 250;       // quanto sale un piano in un tratto
