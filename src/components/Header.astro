@@ -135,8 +135,9 @@ const voci = [
     list-style: none;
     border-radius: var(--radius-full);
     background: rgba(4, 15, 21, 0.5);
-    backdrop-filter: blur(20px);
+    /* prima il prefisso: il minificatore tiene solo l'ultima delle due */
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
   }
 
   .menu__pillola {
