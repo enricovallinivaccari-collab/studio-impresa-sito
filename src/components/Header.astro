@@ -122,8 +122,8 @@ const voci = [
     z-index: 20;
   }
 
-  /* "Header collapse": pillola 52 px, padding 8/10. Come griffin.com: nessun colore di fondo,
-     solo sfocatura di 12 px di quello che passa sotto. */
+  /* "Header collapse" dal Figma: pillola 52 px, padding 8/10,
+     fondo Night #040F15 al 50% + sfocatura dello sfondo (Background blur 20). */
   .menu__lista {
     position: relative;
     isolation: isolate;
@@ -134,9 +134,9 @@ const voci = [
     padding: var(--space-2) var(--space-2-5);
     list-style: none;
     border-radius: var(--radius-full);
-    background: transparent;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(4, 15, 21, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 
   .menu__pillola {
