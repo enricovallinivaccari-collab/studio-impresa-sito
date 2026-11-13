@@ -64,7 +64,7 @@ const lastre = divisioni.map((d, i) => {
 // in verticale fino al punto del piano. A sinistra l'etichetta più in alto va al punto più
 // lontano, a destra uguale: così le linee non si incrociano.
 function disponiNote(note: [number, number, string][], y: number) {
-  const RIGA = 17, CAR = 9, PENDENZA = 0.577, MARGINE = 24;
+  const RIGA = 20, CAR = 8.4, PENDENZA = 0.577, MARGINE = 24;
   const aCapo = (t: string) => {
     const righe: string[] = [];
     for (const parola of t.toUpperCase().split(' ')) {
@@ -88,7 +88,7 @@ function disponiNote(note: [number, number, string][], y: number) {
     for (let k = lato.length - 1; k >= 0; k--) {
       const n = lato[k];
       const attaccoX = destra ? tx - 26 : tx + n.largo + 8;
-      const scarto = destra ? 8 : n.alto - 8;
+      const scarto = destra ? 6 : n.alto - 14;
       let top = (destra ? y - 40 : y - 80) + k * 60;
       top = Math.min(top, n.ay - MARGINE - scarto - Math.abs(attaccoX - n.ax) * PENDENZA);
       if (k < lato.length - 1) top = Math.min(top, alti[k + 1] - n.alto - 16);
@@ -234,7 +234,7 @@ const dalBasso = [...lastre].reverse();
                     <path class="nota__linea" d={n.d} />
                     <circle class="nota__punto" cx={n.px} cy={n.py} r="4" />
                     <text class="nota__testo" x={n.tx} y={n.ty}>
-                      {n.righe.map((r, k) => <tspan x={n.tx} dy={k === 0 ? 0 : 17}>{r}</tspan>)}
+                      {n.righe.map((r, k) => <tspan x={n.tx} dy={k === 0 ? 0 : 20}>{r}</tspan>)}
                     </text>
                   </g>
                 ))}
@@ -391,9 +391,9 @@ const dalBasso = [...lastre].reverse();
     /* Piano attivo: sempre neutro (come Griffin), solo più chiaro. Il colore della
        divisione resta nei punti delle descrizioni e nella lista a sinistra. */
     --e: var(--g600);
-    --c3: #a3b2bd;
-    --c4: #8698a5;
-    --c5: #6e818f;
+    --c3: #a1adb5;
+    --c4: #81909b;
+    --c5: var(--g600);
     --c6: var(--g600);
     --c7: var(--g700);
     --c8: var(--g700);
@@ -405,7 +405,7 @@ const dalBasso = [...lastre].reverse();
   .note { opacity: 0; }
   .nota__linea { fill: none; stroke: var(--g600); stroke-width: 1; }
   .nota__punto { fill: var(--x400); }
-  .nota__testo { fill: var(--color-on-dark); font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.04em; }
+  .nota__testo { fill: var(--color-on-dark); font-family: var(--font-mono); font-size: 14px; letter-spacing: 0; }
 
   .lastra * { transition: fill 0.4s, stroke 0.4s; }
   .lato, .superficie { fill: var(--g950); stroke: var(--e); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
