@@ -253,7 +253,7 @@ const tot = String(profili.length).padStart(2, '0');
   .percorsi__conta { margin: 0 var(--space-3) 0 0; font-family: var(--font-mono); font-size: var(--text-sm-size); line-height: var(--text-sm-lh); color: var(--color-brand-300); font-variant-numeric: tabular-nums; }
   .freccia {
     display: grid; place-items: center;
-    width: calc(52 * var(--u)); height: calc(52 * var(--u));
+    width: calc(52 * var(--u-ui)); height: calc(52 * var(--u-ui));
     border-radius: var(--radius-full);
     border: 1px solid #1e3a52;
     background: transparent;
@@ -261,7 +261,7 @@ const tot = String(profili.length).padStart(2, '0');
     cursor: pointer;
     transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
   }
-  .freccia svg { width: calc(20 * var(--u)); height: auto; }
+  .freccia svg { width: calc(20 * var(--u-ui)); height: auto; }
   .freccia:hover { border-color: var(--color-on-dark); }
   .freccia--piena { background: var(--color-on-dark); border-color: var(--color-on-dark); color: #002337; }
   .freccia--piena:hover { background: var(--color-brand-300); border-color: var(--color-brand-300); }

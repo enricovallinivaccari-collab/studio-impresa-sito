@@ -81,11 +81,13 @@ const base = import.meta.env.BASE_URL;
   .link-evento {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: calc(12 * var(--u-ui));
+    font-size: calc(14 * var(--u-ui)); /* come i pulsanti: cresce appena sugli schermi grandi */
+    line-height: calc(20 * var(--u-ui));
     text-align: right;
   }
-  .link-evento__punto { width: calc(10 * var(--u)); height: auto; animation: pulsa 2s ease-in-out infinite; }
-  .link-evento__freccia { width: calc(18 * var(--u)); height: auto; transition: transform 0.25s var(--ease-out); }
+  .link-evento__punto { width: calc(10 * var(--u-ui)); height: auto; animation: pulsa 2s ease-in-out infinite; }
+  .link-evento__freccia { width: calc(18 * var(--u-ui)); height: auto; transition: transform 0.25s var(--ease-out); }
   .link-evento:hover .link-evento__freccia { transform: translateX(calc(4 * var(--u))); }
 
   @keyframes pulsa {

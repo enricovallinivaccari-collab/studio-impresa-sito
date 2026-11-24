@@ -93,14 +93,14 @@ const voci = [
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: calc(70 * var(--u));
-    padding: calc(15 * var(--u)) var(--space-16);
+    height: calc(70 * var(--u-ui));
+    padding: calc(15 * var(--u-ui)) var(--space-16);
     background: var(--color-night);
   }
 
-  .header__logo img { width: calc(135 * var(--u)); height: auto; }
+  .header__logo img { width: calc(135 * var(--u-ui)); height: auto; }
 
-  .header__azioni { display: flex; align-items: center; gap: var(--space-6); }
+  .header__azioni { display: flex; align-items: center; gap: calc(24 * var(--u-ui)); }
 
   .header__menu-mobile {
     display: none;
@@ -108,14 +108,14 @@ const voci = [
     border: 1.5px solid var(--color-on-dark);
     border-radius: var(--radius-full);
     color: var(--color-on-dark);
-    padding: var(--space-2) var(--space-3);
+    padding: calc(8 * var(--u-ui)) calc(12 * var(--u-ui));
     cursor: pointer;
   }
 
   /* Menu fisso: le voci restano esattamente dove sono nell'header (y = 17 px). */
   .menu {
     position: fixed;
-    top: calc(9 * var(--u));
+    top: calc(9 * var(--u-ui));
     left: 50%;
     transform: translateX(-50%);
     width: max-content; /* senza, a left 50% il menu non può superare metà schermo */
@@ -129,9 +129,9 @@ const voci = [
     isolation: isolate;
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: calc(12 * var(--u-ui));
     margin: 0;
-    padding: var(--space-2) var(--space-2-5);
+    padding: calc(8 * var(--u-ui)) calc(10 * var(--u-ui));
     list-style: none;
     border-radius: var(--radius-full);
     background: rgba(4, 15, 21, 0.5);
@@ -159,8 +159,10 @@ const voci = [
   .voce-menu {
     display: block;
     white-space: nowrap;
-    padding: var(--space-2) var(--space-3);
+    padding: calc(8 * var(--u-ui)) calc(12 * var(--u-ui));
     border-radius: var(--radius-full);
+    font-size: calc(14 * var(--u-ui));
+    line-height: calc(20 * var(--u-ui));
     color: var(--color-on-dark);
     transition: color 0.23s cubic-bezier(0.3, 0.76, 0.27, 1);
   }
@@ -171,7 +173,7 @@ const voci = [
   .menu__extra {
     display: grid;
     grid-template-columns: 0fr;
-    margin-left: calc(-1 * var(--space-3)); /* annulla lo spazio quando è chiusa */
+    margin-left: calc(-1 * calc(12 * var(--u-ui))); /* annulla lo spazio quando è chiusa */
     opacity: 0;
     transition:
       grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1),
@@ -180,7 +182,7 @@ const voci = [
   .menu__extra-dentro {
     min-width: 0;
     overflow: clip;
-    padding-left: var(--space-3);
+    padding-left: calc(12 * var(--u-ui));
     display: flex;
   }
   .menu.is-compatto .menu__extra,
@@ -191,13 +193,13 @@ const voci = [
   }
 
   @media (max-width: 1024px) {
-    .header { padding-inline: var(--space-6); }
+    .header { padding-inline: calc(24 * var(--u-ui)); }
     .menu { display: none; }
     .header__menu-mobile { display: inline-block; }
   }
 
   @media (max-width: 480px) {
-    .header { padding-inline: calc(16 * var(--u)); }
+    .header { padding-inline: calc(16 * var(--u-ui)); }
     .header__azioni :global(.pulsante) { display: none; }
   }
 </style>

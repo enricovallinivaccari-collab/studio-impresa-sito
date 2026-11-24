@@ -21,18 +21,18 @@ const base = import.meta.env.BASE_URL;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
-    padding: var(--space-3) calc(18 * var(--u));
+    gap: calc(8 * var(--u-ui));
+    padding: calc(12 * var(--u-ui)) calc(18 * var(--u-ui));
     border-radius: var(--radius-full);
     font-family: var(--font-mono);
-    font-size: var(--text-xs-size);
-    line-height: var(--text-xs-lh);
+    font-size: calc(12 * var(--u-ui));
+    line-height: calc(18 * var(--u-ui));
     color: var(--color-on-dark);
     text-transform: uppercase;
     white-space: nowrap;
     transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out);
   }
-  .pulsante--piccola { padding-block: var(--space-2); }
+  .pulsante--piccola { padding-block: calc(8 * var(--u-ui)); }
 
   .pulsante--primario { background: var(--color-brand-600); }
   .pulsante--primario:hover { background: var(--color-brand-800); }
@@ -40,8 +40,8 @@ const base = import.meta.env.BASE_URL;
   .pulsante--contorno-chiaro { border: 1.5px solid var(--color-on-dark); }
   .pulsante--contorno-chiaro:hover { background: var(--color-on-dark); color: var(--color-night); }
 
-  .pulsante__freccia { width: calc(16 * var(--u)); height: auto; transition: transform 0.25s var(--ease-out); }
-  .pulsante:hover .pulsante__freccia { transform: translateX(calc(3 * var(--u))); }
+  .pulsante__freccia { width: calc(16 * var(--u-ui)); height: auto; transition: transform 0.25s var(--ease-out); }
+  .pulsante:hover .pulsante__freccia { transform: translateX(calc(3 * var(--u-ui))); }
 
   .pulsante:focus-visible { outline: 2px solid var(--color-brand-300); outline-offset: 3px; }
 </style>

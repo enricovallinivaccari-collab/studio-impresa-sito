@@ -4,6 +4,8 @@
      Fino a 1920 px cresce in proporzione esatta (1,33 a 1920); oltre cresce più piano (1,44 a 2560),
      così su un 27" il layout resta a tutto schermo senza testi enormi. Tutte le misure sono N × var(--u). */
   --u: max(1px, min(100vw / 1440, 1px + 100vw / 5760));
+  /* Unità per pulsanti e header: crescono appena (1,04 a 1920, 1,10 a 2560), scelta di Enrico. */
+  --u-ui: clamp(1px, 0.8714px + 100vw / 11200, 1.1px);
 
   /* Colori */
   --color-night: #040f15;          /* Colors/Night · Background/Page Dark */
