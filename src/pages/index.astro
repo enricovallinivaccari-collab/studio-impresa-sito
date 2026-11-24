@@ -10,8 +10,12 @@ import PerChiLavoriamo from '../components/PerChiLavoriamo.astro';
 <Base>
   <Header />
   <main>
-    <Hero />
-    <StrisciaLoghi />
+    <!-- Prima schermata: hero + loghi riempiono esattamente lo schermo (sotto l'header),
+         la striscia dei loghi è l'ultima cosa visibile in basso. Scelta di Enrico (24/11). -->
+    <div class="apertura">
+      <Hero />
+      <StrisciaLoghi />
+    </div>
     <Divisioni />
     <PerChiLavoriamo />
   </main>
@@ -20,3 +24,15 @@ import PerChiLavoriamo from '../components/PerChiLavoriamo.astro';
 <script>
   import '../scripts/animazioni.js';
 </script>
+
+<style>
+  @media (min-width: 769px) {
+    .apertura {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100svh - 70 * var(--u-ui)); /* 70 = altezza dell'header */
+    }
+    .apertura > :global(.hero) { flex: 1 0 auto; padding-block: min(var(--space-16), 4svh); } /* schermi bassi: i loghi restano dentro */
+    .apertura > :global(.clienti) { padding-bottom: var(--space-10); }
+  }
+</style>

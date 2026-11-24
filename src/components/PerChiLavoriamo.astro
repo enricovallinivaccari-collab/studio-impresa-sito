@@ -111,7 +111,6 @@ const tot = String(profili.length).padStart(2, '0');
 <script>
   import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
-  import { unita } from '../scripts/unita.js';
   gsap.registerPlugin(ScrollTrigger);
 
   // Sezione "Per chi lavoriamo": la sezione resta ferma e lo scroll fa avanzare le card di lato,
@@ -133,12 +132,14 @@ const tot = String(profili.length).padStart(2, '0');
     const misure = () => {
       const cs = getComputedStyle(binario);
       const fin = binario.parentElement!;
-      // --chiusa e --aperta sono scritte come "calc(N * var(--u))": N × unità fluida.
-      const u = unita();
+      // --chiusa e --aperta sono calc() con l'unità fluida: si misurano con una sonda larga quanto la variabile.
       const leggi = (nome: string, base: number) => {
-        const v = cs.getPropertyValue(nome);
-        const n = parseFloat(v.replace(/^\s*calc\(/, '')) || base;
-        return v.includes('var(--u)') ? n * u : n;
+        const sonda = document.createElement('div');
+        sonda.style.cssText = `position:absolute;visibility:hidden;width:var(${nome})`;
+        binario.appendChild(sonda);
+        const v = sonda.getBoundingClientRect().width;
+        sonda.remove();
+        return v || base;
       };
       return {
         chiusa: leggi('--chiusa', 320),
