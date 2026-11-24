@@ -38,7 +38,7 @@ const base = import.meta.env.BASE_URL;
   .hero {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: calc(20 * var(--u));
     padding: var(--space-16);
   }
 
@@ -50,7 +50,7 @@ const base = import.meta.env.BASE_URL;
     gap: var(--space-8);
   }
 
-  .hero__titolo-testo { display: flex; flex-direction: column; gap: 18px; }
+  .hero__titolo-testo { display: flex; flex-direction: column; gap: calc(18 * var(--u)); }
 
   /* Stile "Display 3xl/Regular" */
   .hero__titolo {
@@ -66,7 +66,7 @@ const base = import.meta.env.BASE_URL;
   .riga > span { display: inline-block; }
 
   /* Stile "Text lg/Regular" */
-  .hero__sottotitolo { margin: 0; max-width: 755px; font-size: var(--text-lg-size); line-height: var(--text-lg-lh); }
+  .hero__sottotitolo { margin: 0; max-width: calc(755 * var(--u)); font-size: var(--text-lg-size); line-height: var(--text-lg-lh); }
   .accento { color: var(--color-brand-300); }
 
   .hero__azioni {
@@ -84,9 +84,9 @@ const base = import.meta.env.BASE_URL;
     gap: var(--space-3);
     text-align: right;
   }
-  .link-evento__punto { animation: pulsa 2s ease-in-out infinite; }
-  .link-evento__freccia { transition: transform 0.25s var(--ease-out); }
-  .link-evento:hover .link-evento__freccia { transform: translateX(4px); }
+  .link-evento__punto { width: calc(10 * var(--u)); height: auto; animation: pulsa 2s ease-in-out infinite; }
+  .link-evento__freccia { width: calc(18 * var(--u)); height: auto; transition: transform 0.25s var(--ease-out); }
+  .link-evento:hover .link-evento__freccia { transform: translateX(calc(4 * var(--u))); }
 
   @keyframes pulsa {
     0%, 100% { opacity: 1; transform: scale(1); }
@@ -95,8 +95,8 @@ const base = import.meta.env.BASE_URL;
 
   .hero__immagine {
     flex-shrink: 0;
-    width: 311px;
-    height: 389px;
+    width: calc(311 * var(--u));
+    height: calc(389 * var(--u));
     border-radius: var(--radius-lg);
     background: var(--color-placeholder);
     transform-origin: top right;
@@ -107,15 +107,15 @@ const base = import.meta.env.BASE_URL;
 
   @media (max-width: 1024px) {
     .hero { padding: var(--space-10) var(--space-6); }
-    .hero__titolo { font-size: 56px; line-height: 1.05; white-space: normal; }
-    .hero__immagine { width: 240px; height: 300px; }
+    .hero__titolo { font-size: calc(56 * var(--u)); line-height: 1.05; white-space: normal; }
+    .hero__immagine { width: calc(240 * var(--u)); height: calc(300 * var(--u)); }
   }
 
   @media (max-width: 768px) {
-    .hero { flex-direction: column; align-items: stretch; gap: var(--space-10); padding-inline: 16px; }
-    .hero__titolo { font-size: 40px; white-space: normal; }
+    .hero { flex-direction: column; align-items: stretch; gap: var(--space-10); padding-inline: calc(16 * var(--u)); }
+    .hero__titolo { font-size: calc(40 * var(--u)); white-space: normal; }
     .hero__titolo .riga > span { display: inline; }
-    .hero__immagine { width: 100%; height: auto; aspect-ratio: 311 / 389; max-height: 320px; }
+    .hero__immagine { width: 100%; height: auto; aspect-ratio: 311 / 389; max-height: calc(320 * var(--u)); }
     .link-evento { text-align: left; }
   }
 

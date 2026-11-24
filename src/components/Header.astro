@@ -93,12 +93,12 @@ const voci = [
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 70px;
-    padding: 15px var(--space-16);
+    height: calc(70 * var(--u));
+    padding: calc(15 * var(--u)) var(--space-16);
     background: var(--color-night);
   }
 
-  .header__logo img { width: 135px; height: auto; }
+  .header__logo img { width: calc(135 * var(--u)); height: auto; }
 
   .header__azioni { display: flex; align-items: center; gap: var(--space-6); }
 
@@ -115,7 +115,7 @@ const voci = [
   /* Menu fisso: le voci restano esattamente dove sono nell'header (y = 17 px). */
   .menu {
     position: fixed;
-    top: 9px;
+    top: calc(9 * var(--u));
     left: 50%;
     transform: translateX(-50%);
     width: max-content; /* senza, a left 50% il menu non può superare metà schermo */
@@ -197,7 +197,7 @@ const voci = [
   }
 
   @media (max-width: 480px) {
-    .header { padding-inline: 16px; }
+    .header { padding-inline: calc(16 * var(--u)); }
     .header__azioni :global(.pulsante) { display: none; }
   }
 </style>

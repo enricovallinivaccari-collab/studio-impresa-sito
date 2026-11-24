@@ -285,25 +285,25 @@ const dalBasso = [...lastre].reverse();
     padding: var(--space-24) var(--space-16);
     min-width: 0;
   }
-  .divisioni__intestazione { display: flex; flex-direction: column; gap: 6px; }
+  .divisioni__intestazione { display: flex; flex-direction: column; gap: calc(6 * var(--u)); }
   .divisioni__occhiello { font-size: var(--text-xs-size); line-height: var(--text-xs-lh); letter-spacing: 0.06em; color: var(--color-brand-300); }
   .divisioni__titolo {
     margin: 0;
     font-family: var(--font-heading);
     font-weight: 400;
-    font-size: 48px;
+    font-size: calc(48 * var(--u));
     line-height: 1.04;
     letter-spacing: -0.02em;
   }
 
-  .passi { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); max-width: 592px; }
+  .passi { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); max-width: calc(592 * var(--u)); }
   .passo.is-attivo { margin-bottom: var(--space-6); }
   .passo:has(+ .passo.is-attivo) { margin-bottom: var(--space-6); }
 
   .passo__testa {
     display: flex;
     align-items: center;
-    gap: var(--space-4, 16px);
+    gap: var(--space-4, calc(16 * var(--u)));
     padding: 0;
     border: 0;
     background: none;
@@ -314,7 +314,7 @@ const dalBasso = [...lastre].reverse();
   }
   /* Pallini e linea neutri; il colore della divisione sta nel badge (componente Tag, toni divisione). */
   .passo__punto {
-    width: 10px; height: 10px; flex: none;
+    width: calc(10 * var(--u)); height: calc(10 * var(--u)); flex: none;
     border-radius: 50%;
     background: var(--g700);
     transition: background-color 0.5s, transform 0.5s var(--ease-out);
@@ -322,14 +322,14 @@ const dalBasso = [...lastre].reverse();
   .passo__badge {
     display: inline-flex;
     align-items: center;
-    padding: 4px 12px;
+    padding: calc(4 * var(--u)) calc(12 * var(--u));
     border-radius: var(--radius-full);
     background: var(--punto);
     color: var(--color-night);
     font-family: var(--font-mono);
     font-weight: 500;
     font-size: var(--text-sm-size);
-    line-height: 20px;
+    line-height: calc(20 * var(--u));
     text-transform: uppercase;
     white-space: nowrap;
     transition: filter 0.25s;
@@ -345,20 +345,20 @@ const dalBasso = [...lastre].reverse();
     opacity: 0;
     transition: grid-template-rows 0.6s var(--ease-out), opacity 0.4s;
   }
-  .passo__corpo > div { overflow: hidden; padding-left: 26px; }
+  .passo__corpo > div { overflow: hidden; padding-left: calc(26 * var(--u)); }
   .passo.is-attivo .passo__corpo { grid-template-rows: 1fr; opacity: 1; transition-delay: 0s, 0.15s; }
   .passo__titolo {
-    margin: var(--space-3) 0 6px;
+    margin: var(--space-3) 0 calc(6 * var(--u));
     font-family: var(--font-heading);
     font-weight: 400;
-    font-size: 30px;
+    font-size: calc(30 * var(--u));
     line-height: 1.1;
     letter-spacing: -0.01em;
   }
-  .passo__testo { margin: 0; max-width: 480px; font-size: var(--text-lg-size); line-height: 22px; color: var(--color-brand-300); }
+  .passo__testo { margin: 0; max-width: calc(480 * var(--u)); font-size: var(--text-lg-size); line-height: calc(22 * var(--u)); color: var(--color-brand-300); }
   .passo__azione { margin-top: var(--space-6); padding-bottom: 2px; }
 
-  .divisioni__lead { margin: var(--space-3) 0 0; max-width: 440px; color: var(--color-brand-300); }
+  .divisioni__lead { margin: var(--space-3) 0 0; max-width: calc(440 * var(--u)); color: var(--color-brand-300); }
   .passi__linea { display: none; }
 
   /* Desktop, come Griffin: le voci già viste salgono in alto, l'attiva sta al centro grande,
@@ -369,13 +369,13 @@ const dalBasso = [...lastre].reverse();
     .divisioni__testo[data-pronto] .divisioni__intestazione { position: absolute; left: var(--space-16); right: var(--space-16); top: 50%; transform: translateY(-60%); }
     .divisioni__testo[data-pronto] .passi { position: absolute; inset: var(--space-8) var(--space-16) var(--space-8) var(--space-16); max-width: none; display: block; }
     .divisioni__testo[data-pronto] .passo { position: absolute; left: 0; right: 0; top: 0; margin: 0; }
-    .divisioni__testo[data-pronto] .passo__titolo { font-size: 44px; margin-top: var(--space-4, 16px); }
+    .divisioni__testo[data-pronto] .passo__titolo { font-size: calc(44 * var(--u)); margin-top: var(--space-4, calc(16 * var(--u))); }
     .divisioni__testo[data-pronto] .passi__linea {
-      display: block; position: absolute; left: 24px; top: var(--space-8); bottom: var(--space-8);
+      display: block; position: absolute; left: calc(24 * var(--u)); top: var(--space-8); bottom: var(--space-8);
       width: 1px; background: var(--g800);
     }
     .passi__avanzamento { position: absolute; left: 0; top: 0; width: 1px; height: 100%; background: #a1adb5; transform-origin: top; transform: scaleY(0); }
-    .divisioni__testo[data-pronto] .passo__testa { margin-left: -45px; gap: 35px; }
+    .divisioni__testo[data-pronto] .passo__testa { margin-left: calc(-45 * var(--u)); gap: calc(35 * var(--u)); }
     .divisioni__testo[data-pronto] .passo__corpo > div { padding-left: 0; }
   }
 
@@ -388,7 +388,7 @@ const dalBasso = [...lastre].reverse();
     min-width: 0;
   }
   .divisioni__figura { overflow: hidden; }
-  .divisioni__figura svg { width: 100%; height: 100%; max-height: 760px; display: block; overflow: visible; }
+  .divisioni__figura svg { width: 100%; height: 100%; max-height: calc(760 * var(--u)); display: block; overflow: visible; }
   .griglia { fill: var(--g700); opacity: 0.5; }
 
   .lastra {
@@ -448,18 +448,18 @@ const dalBasso = [...lastre].reverse();
   /* ---------- Schermi più piccoli ---------- */
   @media (max-width: 1024px) {
     .divisioni__testo { padding: var(--space-16) var(--space-6); gap: var(--space-10); }
-    .divisioni__titolo { font-size: 40px; }
+    .divisioni__titolo { font-size: calc(40 * var(--u)); }
   }
 
   @media (max-width: 768px) {
     .divisioni { height: calc(100svh + (var(--passi) + 1) * 80svh); }
     .divisioni__fermo { height: calc(100svh - var(--alto-header)); grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
     .divisioni__figura { order: -1; height: 38svh; }
-    .divisioni__testo { padding: var(--space-6) 16px; gap: var(--space-6); }
-    .divisioni__titolo { font-size: 32px; }
+    .divisioni__testo { padding: var(--space-6) calc(16 * var(--u)); gap: var(--space-6); }
+    .divisioni__titolo { font-size: calc(32 * var(--u)); }
     .divisioni__lead { display: none; }
-    .passo__titolo { font-size: 22px; }
-    .passo__testo { font-size: 16px; }
+    .passo__titolo { font-size: calc(22 * var(--u)); }
+    .passo__testo { font-size: calc(16 * var(--u)); }
     .passi { gap: var(--space-2); }
     .passo__azione { margin-top: var(--space-3); }
     .passo.is-attivo, .passo:has(+ .passo.is-attivo) { margin-bottom: var(--space-2); }

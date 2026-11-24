@@ -1,6 +1,7 @@
 // Prime animazioni della homepage, con GSAP.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { unita } from './unita.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -48,7 +49,7 @@ function ingrandisciImmagine() {
   const loghi = document.querySelector('[data-striscia]');
   if (!img || !link || !freccia || !loghi) return;
   const conHover = window.matchMedia('(hover: hover) and (min-width: 769px)');
-  const larghezzaFinale = 380; // px, scelta di Enrico
+  const larghezzaFinale = () => 380 * unita(); // 380 px a 1440, scelta di Enrico; cresce con lo schermo
   const margine = 16; // spazio minimo che resta tra immagine e loghi
 
   const apri = () => {
@@ -57,7 +58,7 @@ function ingrandisciImmagine() {
     const altezza = img.offsetHeight; // misure senza l'ingrandimento in corso
     const larghezza = img.offsetWidth;
     const limiteLoghi = (loghi.getBoundingClientRect().top - margine - top) / altezza;
-    const scala = Math.max(1, Math.min(larghezzaFinale / larghezza, limiteLoghi));
+    const scala = Math.max(1, Math.min(larghezzaFinale() / larghezza, limiteLoghi));
     // La freccia sparisce: la scritta si sposta anche dello spazio che occupava.
     const spazioFreccia = freccia.offsetWidth + parseFloat(getComputedStyle(link).columnGap || '0');
     const d = riduci ? 0 : 0.7;
@@ -155,18 +156,19 @@ function animaDivisioni() {
   // ---- Colonna testo ----
   const desktop = window.matchMedia('(min-width: 769px)');
   if (desktop.matches) testo.setAttribute('data-pronto', '');
-  const RIGA = 36; // passo tra le voci chiuse (badge alto 28 + 8)
+  let RIGA = 36; // passo tra le voci chiuse (badge alto 28 + 8), × unità fluida: lo aggiorna posiziona()
   // La voce attiva sta a un terzo dell'altezza, ma se titolo + testo + pulsante sono alti sale,
   // per non toccare le voci che seguono in fondo.
   const yAttiva = (p, k, alto) => {
     const testa = p.querySelector('.passo__testa').offsetHeight;
     const corpo = p.querySelector('.passo__corpo > div').scrollHeight;
     const primaSotto = alto - (n - k - 1) * RIGA;
-    return Math.max(0, Math.min(alto * 0.36, primaSotto - 32 - testa - corpo));
+    return Math.max(0, Math.min(alto * 0.36, primaSotto - 32 * unita() - testa - corpo));
   };
   const posiziona = (k, subito) => {
     if (!desktop.matches) return;
     const alto = elenco.clientHeight;
+    RIGA = 36 * unita();
     const d = subito || riduci ? 0 : 0.7;
     passi.forEach((p, i) => {
       let y;
@@ -179,7 +181,7 @@ function animaDivisioni() {
     gsap.to(intro, { autoAlpha: k < 0 ? 1 : 0, yPercent: k < 0 ? -60 : -90, duration: d, ease: 'power2.out', overwrite: 'auto' });
     if (avanzamento) {
       gsap.to(avanzamento, {
-        scaleY: k < 0 ? 0 : (yAttiva(passi[k], k, alto) + 14) / alto,
+        scaleY: k < 0 ? 0 : (yAttiva(passi[k], k, alto) + 14 * unita()) / alto,
         duration: d, ease: 'power3.inOut', overwrite: 'auto',
       });
     }

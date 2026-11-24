@@ -111,6 +111,7 @@ const tot = String(profili.length).padStart(2, '0');
 <script>
   import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { unita } from '../scripts/unita.js';
   gsap.registerPlugin(ScrollTrigger);
 
   // Sezione "Per chi lavoriamo": la sezione resta ferma e lo scroll fa avanzare le card di lato,
@@ -132,9 +133,16 @@ const tot = String(profili.length).padStart(2, '0');
     const misure = () => {
       const cs = getComputedStyle(binario);
       const fin = binario.parentElement!;
+      // --chiusa e --aperta sono scritte come "calc(N * var(--u))": N × unità fluida.
+      const u = unita();
+      const leggi = (nome: string, base: number) => {
+        const v = cs.getPropertyValue(nome);
+        const n = parseFloat(v.replace(/^\s*calc\(/, '')) || base;
+        return v.includes('var(--u)') ? n * u : n;
+      };
       return {
-        chiusa: parseFloat(cs.getPropertyValue('--chiusa')) || 320,
-        aperta: parseFloat(cs.getPropertyValue('--aperta')) || 680,
+        chiusa: leggi('--chiusa', 320),
+        aperta: leggi('--aperta', 680),
         gap: parseFloat(cs.columnGap) || 16,
         visibile: fin.clientWidth - parseFloat(getComputedStyle(fin).paddingLeft) * 2,
       };
@@ -235,17 +243,17 @@ const tot = String(profili.length).padStart(2, '0');
     padding: var(--space-24) var(--space-16);
     overflow: hidden;
   }
-  .percorsi.is-ferma .percorsi__fermo { position: sticky; top: 0; height: 100vh; padding-block: 104px var(--space-10); gap: var(--space-10); }
+  .percorsi.is-ferma .percorsi__fermo { position: sticky; top: 0; height: 100vh; padding-block: calc(104 * var(--u)) var(--space-10); gap: var(--space-10); }
 
   /* ---------- Intestazione ---------- */
   .percorsi__intestazione { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--space-8); }
   .percorsi__occhiello { font-size: var(--text-xs-size); line-height: var(--text-xs-lh); letter-spacing: 0.06em; color: var(--color-brand-300); margin-bottom: var(--space-3); }
-  .percorsi__titolo { margin: 0; font-family: var(--font-heading); font-weight: 400; font-size: 60px; line-height: 72px; letter-spacing: -0.02em; }
+  .percorsi__titolo { margin: 0; font-family: var(--font-heading); font-weight: 400; font-size: calc(60 * var(--u)); line-height: calc(72 * var(--u)); letter-spacing: -0.02em; }
   .percorsi__nav { display: flex; align-items: center; gap: var(--space-3); }
   .percorsi__conta { margin: 0 var(--space-3) 0 0; font-family: var(--font-mono); font-size: var(--text-sm-size); line-height: var(--text-sm-lh); color: var(--color-brand-300); font-variant-numeric: tabular-nums; }
   .freccia {
     display: grid; place-items: center;
-    width: 52px; height: 52px;
+    width: calc(52 * var(--u)); height: calc(52 * var(--u));
     border-radius: var(--radius-full);
     border: 1px solid #1e3a52;
     background: transparent;
@@ -253,6 +261,7 @@ const tot = String(profili.length).padStart(2, '0');
     cursor: pointer;
     transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
   }
+  .freccia svg { width: calc(20 * var(--u)); height: auto; }
   .freccia:hover { border-color: var(--color-on-dark); }
   .freccia--piena { background: var(--color-on-dark); border-color: var(--color-on-dark); color: #002337; }
   .freccia--piena:hover { background: var(--color-brand-300); border-color: var(--color-brand-300); }
@@ -261,11 +270,11 @@ const tot = String(profili.length).padStart(2, '0');
   /* ---------- Card ---------- */
   .percorsi__finestra { margin-inline: calc(var(--space-16) * -1); padding-inline: var(--space-16); }
   .percorsi__binario {
-    --alta: clamp(400px, calc(100vh - 420px), 600px);
-    --aperta: 680px;
-    --chiusa: 320px;
+    --alta: clamp(calc(400 * var(--u)), calc(100vh - calc(420 * var(--u))), calc(600 * var(--u)));
+    --aperta: calc(680 * var(--u));
+    --chiusa: calc(320 * var(--u));
     list-style: none; margin: 0; padding: 0;
-    display: flex; gap: 16px;
+    display: flex; gap: calc(16 * var(--u));
     transition: transform 0.9s var(--ease-out);
     will-change: transform;
   }
@@ -273,7 +282,7 @@ const tot = String(profili.length).padStart(2, '0');
     position: relative;
     flex: 0 0 var(--chiusa);
     height: var(--alta);
-    border-radius: 24px;
+    border-radius: calc(24 * var(--u));
     overflow: hidden;
     isolation: isolate;
     background: #0b1e2b;
@@ -289,39 +298,39 @@ const tot = String(profili.length).padStart(2, '0');
   }
   .card.is-attiva::after { background: linear-gradient(180deg, rgba(4, 15, 21, 0) 20%, rgba(4, 15, 21, 0.95) 100%); }
 
-  .card__numero { position: absolute; top: 28px; left: 28px; font-family: var(--font-mono); font-size: var(--text-sm-size); line-height: var(--text-sm-lh); }
-  .card.is-attiva .card__numero { left: 36px; }
+  .card__numero { position: absolute; top: calc(28 * var(--u)); left: calc(28 * var(--u)); font-family: var(--font-mono); font-size: var(--text-sm-size); line-height: var(--text-sm-lh); }
+  .card.is-attiva .card__numero { left: calc(36 * var(--u)); }
   .card__apri {
     position: absolute; inset: 0;
     display: flex; justify-content: flex-end; align-items: flex-start;
-    padding: 24px 28px;
+    padding: calc(24 * var(--u)) calc(28 * var(--u));
     border: 0; background: none; color: var(--color-on-dark); cursor: pointer;
     transition: opacity 0.4s var(--ease-out);
   }
-  .card__apri svg { transition: transform 0.4s var(--ease-out); }
+  .card__apri svg { width: calc(40 * var(--u)); height: auto; transition: transform 0.4s var(--ease-out); }
   .card__apri:hover svg { transform: rotate(90deg); }
   .card.is-attiva .card__apri { opacity: 0; pointer-events: none; }
 
   .card__titolo-chiuso {
-    position: absolute; left: 28px; right: 28px; bottom: 28px; margin: 0;
-    font-family: var(--font-heading); font-weight: 400; font-size: 30px; line-height: 38px; letter-spacing: -0.01em;
+    position: absolute; left: calc(28 * var(--u)); right: calc(28 * var(--u)); bottom: calc(28 * var(--u)); margin: 0;
+    font-family: var(--font-heading); font-weight: 400; font-size: calc(30 * var(--u)); line-height: calc(38 * var(--u)); letter-spacing: -0.01em;
     pointer-events: none;
     transition: opacity 0.4s var(--ease-out), transform 0.6s var(--ease-out);
   }
-  .card.is-attiva .card__titolo-chiuso { opacity: 0; transform: translateY(12px); }
+  .card.is-attiva .card__titolo-chiuso { opacity: 0; transform: translateY(calc(12 * var(--u))); }
 
   .card__contenuto {
-    position: absolute; left: 36px; bottom: 36px; width: 560px;
-    display: flex; flex-direction: column; gap: 20px;
-    opacity: 0; transform: translateY(24px); pointer-events: none;
+    position: absolute; left: calc(36 * var(--u)); bottom: calc(36 * var(--u)); width: calc(560 * var(--u));
+    display: flex; flex-direction: column; gap: calc(20 * var(--u));
+    opacity: 0; transform: translateY(calc(24 * var(--u))); pointer-events: none;
     transition: opacity 0.35s var(--ease-out), transform 0.35s var(--ease-out);
   }
   .card.is-attiva .card__contenuto { opacity: 1; transform: none; pointer-events: auto; transition: opacity 0.7s 0.35s var(--ease-out), transform 0.9s 0.35s var(--ease-out); }
-  .card__titolo { margin: 0; font-family: var(--font-heading); font-weight: 400; font-size: 48px; line-height: 60px; letter-spacing: -0.02em; }
-  .card__testo { margin: 0; max-width: 480px; color: var(--color-brand-300); }
-  .card__punti { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2) 20px; font-size: 16px; line-height: 24px; }
+  .card__titolo { margin: 0; font-family: var(--font-heading); font-weight: 400; font-size: calc(48 * var(--u)); line-height: calc(60 * var(--u)); letter-spacing: -0.02em; }
+  .card__testo { margin: 0; max-width: calc(480 * var(--u)); color: var(--color-brand-300); }
+  .card__punti { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2) calc(20 * var(--u)); font-size: calc(16 * var(--u)); line-height: calc(24 * var(--u)); }
   .card__punti li { display: flex; align-items: center; gap: var(--space-2); }
-  .card__punti svg { color: var(--color-brand-400); flex: none; }
+  .card__punti svg { width: calc(20 * var(--u)); height: auto; color: var(--color-brand-400); flex: none; }
   .card__azione { padding-top: var(--space-2); }
 
   /* ---------- Barra di avanzamento ---------- */
@@ -332,32 +341,32 @@ const tot = String(profili.length).padStart(2, '0');
   @media (max-width: 1024px) {
     .percorsi__fermo { padding-inline: var(--space-6); }
     .percorsi__finestra { margin-inline: calc(var(--space-6) * -1); padding-inline: var(--space-6); }
-    .percorsi__titolo { font-size: 48px; line-height: 56px; }
-    .percorsi__binario { --aperta: 600px; }
-    .card__contenuto { width: calc(100% - 72px); }
+    .percorsi__titolo { font-size: calc(48 * var(--u)); line-height: calc(56 * var(--u)); }
+    .percorsi__binario { --aperta: calc(600 * var(--u)); }
+    .card__contenuto { width: calc(100% - calc(72 * var(--u))); }
   }
 
   @media (max-width: 768px) {
-    .percorsi__fermo { padding: var(--space-16) 16px; gap: var(--space-8); }
-    .percorsi__titolo { font-size: 36px; line-height: 44px; }
+    .percorsi__fermo { padding: var(--space-16) calc(16 * var(--u)); gap: var(--space-8); }
+    .percorsi__titolo { font-size: calc(36 * var(--u)); line-height: calc(44 * var(--u)); }
     .percorsi__intestazione { align-items: flex-end; }
     .percorsi__conta { display: none; }
-    .freccia { width: 44px; height: 44px; }
+    .freccia { width: calc(44 * var(--u)); height: calc(44 * var(--u)); }
     .percorsi__finestra {
-      margin-inline: -16px; padding-inline: 16px;
-      overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 16px;
+      margin-inline: calc(-16 * var(--u)); padding-inline: calc(16 * var(--u));
+      overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: calc(16 * var(--u));
       scrollbar-width: none;
     }
     .percorsi__finestra::-webkit-scrollbar { display: none; }
-    .percorsi__binario { --alta: 520px; transition: none; }
+    .percorsi__binario { --alta: calc(520 * var(--u)); transition: none; }
     .card, .card.is-attiva { flex-basis: 85vw; scroll-snap-align: start; }
     .card::after, .card.is-attiva::after { background: linear-gradient(180deg, rgba(4, 15, 21, 0) 15%, rgba(4, 15, 21, 0.95) 100%); }
     .card__apri, .card__titolo-chiuso { display: none; }
-    .card__numero, .card.is-attiva .card__numero { left: 24px; top: 24px; }
-    .card__contenuto, .card.is-attiva .card__contenuto { left: 24px; right: 24px; bottom: 24px; width: auto; opacity: 1; transform: none; pointer-events: auto; transition: none; gap: 14px; }
-    .card__titolo { font-size: 30px; line-height: 38px; }
-    .card__testo { font-size: 16px; line-height: 24px; }
-    .card__punti { flex-direction: column; font-size: 14px; line-height: 20px; }
+    .card__numero, .card.is-attiva .card__numero { left: calc(24 * var(--u)); top: calc(24 * var(--u)); }
+    .card__contenuto, .card.is-attiva .card__contenuto { left: calc(24 * var(--u)); right: calc(24 * var(--u)); bottom: calc(24 * var(--u)); width: auto; opacity: 1; transform: none; pointer-events: auto; transition: none; gap: calc(14 * var(--u)); }
+    .card__titolo { font-size: calc(30 * var(--u)); line-height: calc(38 * var(--u)); }
+    .card__testo { font-size: calc(16 * var(--u)); line-height: calc(24 * var(--u)); }
+    .card__punti { flex-direction: column; font-size: calc(14 * var(--u)); line-height: calc(20 * var(--u)); }
   }
 
   @media (prefers-reduced-motion: reduce) {

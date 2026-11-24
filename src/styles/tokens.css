@@ -1,5 +1,10 @@
 /* Token dal file Figma "Studio Impresa Website" (collezioni Primitives e Tokens). */
 :root {
+  /* Unità fluida: 1px fino a 1440 px di larghezza (il 13" è il riferimento), poi il sito cresce con lo schermo.
+     Fino a 1920 px cresce in proporzione esatta (1,33 a 1920); oltre cresce più piano (1,44 a 2560),
+     così su un 27" il layout resta a tutto schermo senza testi enormi. Tutte le misure sono N × var(--u). */
+  --u: max(1px, min(100vw / 1440, 1px + 100vw / 5760));
+
   /* Colori */
   --color-night: #040f15;          /* Colors/Night · Background/Page Dark */
   --color-brand-600: #006eb7;      /* Button/Primary Background */
@@ -17,24 +22,24 @@
   --font-mono: 'Atkinson Hyperlegible Mono', ui-monospace, monospace;
 
   /* Taglie (Typeface/size e line height) */
-  --display-3xl-size: 80px;  --display-3xl-lh: 82px;
-  --text-lg-size: 18px;      --text-lg-lh: 28px;
-  --text-sm-size: 14px;      --text-sm-lh: 20px;
-  --text-xs-size: 12px;      --text-xs-lh: 18px;
+  --display-3xl-size: calc(80 * var(--u));  --display-3xl-lh: calc(82 * var(--u));
+  --text-lg-size: calc(18 * var(--u));      --text-lg-lh: calc(28 * var(--u));
+  --text-sm-size: calc(14 * var(--u));      --text-sm-lh: calc(20 * var(--u));
+  --text-xs-size: calc(12 * var(--u));      --text-xs-lh: calc(18 * var(--u));
 
   /* Spaziature (Utilities/Spacing) */
-  --space-2: 8px;
-  --space-2-5: 10px;
-  --space-3: 12px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --space-16: 64px;
-  --space-24: 96px;
+  --space-2: calc(8 * var(--u));
+  --space-2-5: calc(10 * var(--u));
+  --space-3: calc(12 * var(--u));
+  --space-6: calc(24 * var(--u));
+  --space-8: calc(32 * var(--u));
+  --space-10: calc(40 * var(--u));
+  --space-16: calc(64 * var(--u));
+  --space-24: calc(96 * var(--u));
 
   /* Raggi */
-  --radius-lg: 8px;
-  --radius-full: 999px;
+  --radius-lg: calc(8 * var(--u));
+  --radius-full: calc(999 * var(--u));
 
   /* Animazioni */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
